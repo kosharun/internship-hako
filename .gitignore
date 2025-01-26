@@ -24,7 +24,7 @@ target/
 dist/
 
 # JetBrains IDE
-.idea/
+order-management/.idea/
 
 # Unit test reports
 TEST*.xml
