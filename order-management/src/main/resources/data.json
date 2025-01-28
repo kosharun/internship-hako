@@ -1,0 +1,107 @@
+{
+  "roles": [
+    { "name": "ADMIN" },
+    { "name": "USER" }
+  ],
+  "users": [
+    {
+      "username": "john_doe",
+      "password": "securepassword",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "dateOfBirth": "1990-05-15",
+      "role": "ADMIN",
+      "address": {
+        "street": "123 Main St",
+        "zipCode": "10001",
+        "placeName": "New York",
+        "stateName": "NY"
+      }
+    },
+    {
+      "username": "jane_doe",
+      "password": "securepassword",
+      "email": "jane@example.com",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "dateOfBirth": "1992-08-25",
+      "role": "USER",
+      "address": {
+        "street": "456 Elm St",
+        "zipCode": "20002",
+        "placeName": "Washington",
+        "stateName": "DC"
+      }
+    }
+  ],
+  "catalogs": [
+    {
+      "name": "Catalog1"
+    }
+  ],
+  "products": [
+    {
+      "name": "Laptop Lenovo",
+      "description": "Powerful gaming laptop",
+      "price": 1200.99,
+      "datePublished": "2023-06-01",
+      "availableUntil": "2025-06-01",
+      "stockQuantity": 5,
+      "catalog": "Catalog1"
+    },
+    {
+      "name": "Samsung Galaxy S24",
+      "description": "Latest Samsung smartphone",
+      "price": 999.99,
+      "datePublished": "2024-01-15",
+      "availableUntil": "2026-01-15",
+      "stockQuantity": 10,
+      "catalog": "Catalog1"
+    },
+    {
+      "name": "T-Shirt Nike",
+      "description": "Comfortable cotton t-shirt",
+      "price": 19.99,
+      "datePublished": "2022-09-10",
+      "availableUntil": "2025-09-10",
+      "stockQuantity": 50,
+      "catalog": "Catalog1"
+    }
+  ],
+  "orderStatuses": [
+    { "name": "Completed" },
+    { "name": "Cancelled" }
+  ],
+  "orders": [
+    {
+      "user": "john_doe",
+      "status": "Completed",
+      "totalPrice": 1219.98,
+      "orderItems": [
+        {
+          "product": "Laptop Lenovo",
+          "quantity": 1
+        }
+      ],
+      "createdAt": "2024-01-26T12:00:00"
+    },
+    {
+      "user": "jane_doe",
+      "status": "Completed",
+      "totalPrice": 999.99,
+      "orderItems": [
+        {
+          "product": "Laptop Lenovo",
+          "quantity": 1
+        },
+        {
+          "product": "Samsung Galaxy S24",
+          "quantity": 3
+        }
+      ],
+      "createdAt": "2024-01-27T15:30:00"
+    }
+  ]
+
+}
