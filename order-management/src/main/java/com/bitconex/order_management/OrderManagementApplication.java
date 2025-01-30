@@ -1,13 +1,19 @@
 package com.bitconex.order_management;
 
+import com.bitconex.order_management.dto.AddressDTO;
+import com.bitconex.order_management.dto.UserDTO;
+import com.bitconex.order_management.dto.UserRequestDTO;
 import com.bitconex.order_management.entity.Role;
-import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.repository.RoleRepository;
 import com.bitconex.order_management.repository.UserRepository;
+import com.bitconex.order_management.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 @SpringBootApplication
 public class OrderManagementApplication {
@@ -17,25 +23,46 @@ public class OrderManagementApplication {
 	}
 
 	@Bean
-	public CommandLineRunner run(UserRepository userRepository, RoleRepository roleRepository) {
+	public CommandLineRunner run(UserRepository userRepository, RoleRepository roleRepository, UserService userService) {
 		return args -> {
-			/*// Kreiranje i čuvanje role
-			Role adminRole = new Role();
-			adminRole.setName("ADMIN");
-			roleRepository.save(adminRole);
 
-			// Kreiranje i čuvanje korisnika
-			User user = new User();
-			user.setUsername("john_doe");
-			user.setPassword("securepassword");
-			user.setEmail("john@example.com");
-			user.setRole(adminRole);
+			/*// Provjera da li postoji rola "USER" u bazi
+			Optional<Role> userRole = roleRepository.findByName("USER");
+			if (userRole.isEmpty()) {
+				Role role = new Role();
+				role.setName("USER");
+				roleRepository.save(role);
+				System.out.println("✅ Role 'USER' created!");
+				userRole = Optional.of(role);
+			}
 
-			userRepository.save(user);
+			// Kreiranje novog korisnika
+			UserRequestDTO newUser = new UserRequestDTO();
+			newUser.setUsername("marko123");
+			newUser.setPassword("securepassword");
+			newUser.setEmail("marko@example.com");
+			newUser.setFirstName("Marko");
+			newUser.setLastName("Marković");
+			newUser.setDateOfBirth(LocalDate.of(1995, 4, 10));
+			newUser.setRole(userRole.get()); // Postavljanje role
 
-			// Ispis svih korisnika
-			System.out.println("Lista svih korisnika:");
-			userRepository.findAll().forEach(u -> System.out.println(u.getUsername() + " - " + u.getRole().getName()));*/
+			// Dodavanje adrese korisniku
+			AddressDTO addressDTO = new AddressDTO();
+			addressDTO.setStreet("789 Oak St");
+			addressDTO.setZipCode("30003");
+			addressDTO.setPlaceName("Los Angeles");
+			addressDTO.setStateName("CA");
+			newUser.setAddress(addressDTO);
+
+			try {
+				UserDTO createdUser = userService.createUser(newUser);
+				System.out.println("✅ User created: " + createdUser);
+			} catch (RuntimeException e) {
+				System.out.println("⚠️ Error creating user: " + e.getMessage());
+			}*/
+
+			// Ispis svih korisnika u bazi
+			System.out.println(userService.getUser("marko123").toString());
 		};
 	}
 }

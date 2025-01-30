@@ -43,7 +43,27 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        seedDatabase();
+        /*// Step 1: Delete all existing data
+        clearDatabase();
+
+        // Step 2: Seed new data
+        seedDatabase();*/
+    }
+
+    /**
+     * Deletes all data from the database tables.
+     */
+    private void clearDatabase() {
+        // Delete in reverse order to respect foreign key constraints
+        orderItemRepository.deleteAll();
+        orderRepository.deleteAll();
+        orderStatusRepository.deleteAll();
+        productRepository.deleteAll();
+        catalogRepository.deleteAll();
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+
+        System.out.println("🗑️ All existing data deleted!");
     }
 
     private void seedDatabase() throws IOException {
