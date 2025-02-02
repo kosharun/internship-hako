@@ -9,6 +9,7 @@ import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.repository.AddressRepository;
 import com.bitconex.order_management.repository.RoleRepository;
 import com.bitconex.order_management.repository.UserRepository;
+import static com.bitconex.order_management.utils.ConsoleUtil.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -85,7 +86,21 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    public String login(String username, String password) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if(optionalUser.isEmpty()) {
+            printError("User with that username does not exist!");
+            return "";
+        }
 
+        User user = optionalUser.get();
+        if(passwordEncoder.matches(password, user.getPassword())) {
+            return user.getRole().getName();
+        } else {
+            printError("Wrong password!");
+            return "";
+        }
+    }
 
 
     public UserDTO mapToDTO(User user) {

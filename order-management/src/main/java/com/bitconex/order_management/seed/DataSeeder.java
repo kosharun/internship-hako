@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +27,13 @@ public class DataSeeder implements CommandLineRunner {
     private final OrderRepository orderRepository;
     private final OrderStatusRepository orderStatusRepository;
     private final OrderItemRepository orderItemRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+
 
     public DataSeeder(RoleRepository roleRepository, UserRepository userRepository,
                       ProductRepository productRepository, CatalogRepository catalogRepository,
                       OrderRepository orderRepository, OrderStatusRepository orderStatusRepository,
-                      OrderItemRepository orderItemRepository) {
+                      OrderItemRepository orderItemRepository, BCryptPasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
@@ -38,6 +41,7 @@ public class DataSeeder implements CommandLineRunner {
         this.orderRepository = orderRepository;
         this.orderStatusRepository = orderStatusRepository;
         this.orderItemRepository = orderItemRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -139,7 +143,7 @@ public class DataSeeder implements CommandLineRunner {
 
                 user.setUsername(username);
                 user.setEmail(email);
-                user.setPassword(password);
+                user.setPassword(passwordEncoder.encode(password));
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
                 user.setDateOfBirth(LocalDate.parse(dateOfBirth));
