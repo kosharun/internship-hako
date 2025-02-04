@@ -6,12 +6,14 @@ import com.bitconex.order_management.dto.UserRequestDTO;
 import com.bitconex.order_management.entity.Address;
 import com.bitconex.order_management.entity.Role;
 import com.bitconex.order_management.entity.User;
-import com.bitconex.order_management.repository.AddressRepository;
+import static com.bitconex.order_management.mapper.DTOMapper.*;
+
 import com.bitconex.order_management.repository.RoleRepository;
 import com.bitconex.order_management.repository.UserRepository;
 import static com.bitconex.order_management.utils.ConsoleUtil.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,24 +105,5 @@ public class UserService {
     }
 
 
-    public UserDTO mapToDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername(user.getUsername());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setRole(user.getRole());
-        userDTO.setDateOfBirth(user.getDateOfBirth());
 
-        AddressDTO addressDTO = new AddressDTO();
-        Address userAddress = user.getAddress();
-        addressDTO.setStreet(userAddress.getStreet());
-        addressDTO.setZipCode(userAddress.getZipCode());
-        addressDTO.setPlaceName(userAddress.getPlaceName());
-        addressDTO.setStateName(userAddress.getStateName());
-
-        userDTO.setAddress(addressDTO);
-        return userDTO;
-
-    }
 }

@@ -14,10 +14,12 @@ public class MainMenu {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService;
     private final SessionManager sessionManager;
+    private final Administration administrationConsole;
 
-    public MainMenu(UserService userService, SessionManager sessionManager) {
+    public MainMenu(UserService userService, SessionManager sessionManager, Administration administrationConsole) {
         this.userService = userService;
         this.sessionManager = sessionManager;
+        this.administrationConsole = administrationConsole;
     }
 
     public void start() {
@@ -40,6 +42,11 @@ public class MainMenu {
         }
 
         sessionManager.setCurrentUserRole(role);
-        printSuccess("Logged in as " + sessionManager.getCurrentUserRole());
+
+        if("ADMIN".matches(role))
+            administrationConsole.startAdminConsole();
+            printSuccess("Logged in as " + sessionManager.getCurrentUserRole());
+
+
     }
 }

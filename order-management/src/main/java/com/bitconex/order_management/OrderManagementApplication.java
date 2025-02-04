@@ -38,6 +38,7 @@ public class OrderManagementApplication {
 	public CommandLineRunner run(UserRepository userRepository, RoleRepository roleRepository, UserService userService, SessionManager sessionManager) {
 		return args -> {
 			mainMenu.start();
+			
 		};
 	}
 }

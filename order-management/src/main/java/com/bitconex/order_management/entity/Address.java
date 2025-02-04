@@ -5,10 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "addresses")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

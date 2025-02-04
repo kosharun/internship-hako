@@ -31,8 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/products").permitAll() // Svi mogu vidjeti listu proizvoda
                         .requestMatchers("/orders").authenticated() // Samo prijavljeni korisnici mogu vidjeti narudžbe
                         .anyRequest().authenticated()
-                )
-                .httpBasic(); // Koristimo Basic Authentication
+                );
 
         return http.build();
     }
