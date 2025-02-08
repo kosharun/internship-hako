@@ -52,16 +52,11 @@ public class UserService {
         user.setRole(role);
 
 
-        AddressDTO addressDTO = userRequestDTO.getAddress();
-        Address address = new Address();
-        address.setStreet(addressDTO.getStreet());
-        address.setZipCode(addressDTO.getZipCode());
-        address.setPlaceName(addressDTO.getPlaceName());
-        address.setStateName(addressDTO.getStateName());
-
+        Address address = userRequestDTO.getAddress();
         user.setAddress(address);
 
         userRepository.save(user);
+        printSuccess("Successfully created user: " + userRequestDTO.getUsername());
         return mapToDTO(user);
     }
 
@@ -86,23 +81,22 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
         userRepository.delete(user);
+        printSuccess("Successfully removed user: " + username);
     }
 
     public String login(String username, String password) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if(optionalUser.isEmpty()) {
-            printError("User with that username does not exist!");
-            return "";
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User with that username does not exist!"));
 
-        User user = optionalUser.get();
-        if(passwordEncoder.matches(password, user.getPassword())) {
-            return user.getRole().getName();
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            String role = user.getRole().getName();
+            printSuccess("Successfully logged in as" + username + " with a role: " + role);
+            return role;
         } else {
-            printError("Wrong password!");
-            return "";
+            throw new RuntimeException("Wrong password!");
         }
     }
+
 
 
 

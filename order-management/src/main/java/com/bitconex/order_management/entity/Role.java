@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Role {
     @Id // ova anotacija znaci da je ovo primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ovaj strategy je za auto increment

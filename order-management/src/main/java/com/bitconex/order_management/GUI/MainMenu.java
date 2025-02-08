@@ -43,10 +43,10 @@ public class MainMenu {
 
         sessionManager.setCurrentUserRole(role);
 
-        if("ADMIN".matches(role))
+        if("ADMIN".matches(role)) {
             administrationConsole.startAdminConsole();
             printSuccess("Logged in as " + sessionManager.getCurrentUserRole());
-
+        }
 
     }
 }

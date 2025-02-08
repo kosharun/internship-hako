@@ -11,22 +11,19 @@ public class DTOMapper {
 
 
     public static UserDTO mapToDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername(user.getUsername());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setRole(user.getRole());
-        userDTO.setDateOfBirth(user.getDateOfBirth());
+        UserDTO userDTO = UserDTO.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRole())
+                .dateOfBirth(user.getDateOfBirth())
+                .build();
 
-        AddressDTO addressDTO = new AddressDTO();
+
         Address userAddress = user.getAddress();
-        addressDTO.setStreet(userAddress.getStreet());
-        addressDTO.setZipCode(userAddress.getZipCode());
-        addressDTO.setPlaceName(userAddress.getPlaceName());
-        addressDTO.setStateName(userAddress.getStateName());
 
-        userDTO.setAddress(addressDTO);
+        userDTO.setAddress(userAddress);
         return userDTO;
     }
 

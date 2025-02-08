@@ -1,5 +1,6 @@
 package com.bitconex.order_management.dto;
 
+import com.bitconex.order_management.entity.Address;
 import com.bitconex.order_management.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +19,5 @@ public class UserRequestDTO {
     private String lastName;
     private Role role;
     private LocalDate dateOfBirth;
-    private AddressDTO address;
+    private Address address;
 }
