@@ -8,9 +8,15 @@ import com.bitconex.order_management.entity.Role;
 import com.bitconex.order_management.entity.User;
 import static com.bitconex.order_management.mapper.DTOMapper.*;
 
+import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.RoleRepository;
 import com.bitconex.order_management.repository.UserRepository;
 import static com.bitconex.order_management.utils.ConsoleUtil.*;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +24,35 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DTOMapper dtoMapper;
+    private final Validator validator; // 🔹 Inject Validator
 
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, DTOMapper dtoMapper, Validator validator) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.dtoMapper = dtoMapper;
+        this.validator = validator;
     }
 
-    public UserDTO createUser(UserRequestDTO userRequestDTO) {
-
+    public UserDTO createUser(@Valid UserRequestDTO userRequestDTO) {
+        Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(userRequestDTO);
+        if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder("Validation failed: ");
+            for (ConstraintViolation<UserRequestDTO> violation : violations) {
+                errorMessage.append(violation.getPropertyPath()).append(" ").append(violation.getMessage()).append("; ");
+            }
+            throw new ConstraintViolationException(errorMessage.toString(), violations);
+        }
         if(userRepository.findByUsername(userRequestDTO.getUsername()).isPresent()) {
             throw new RuntimeException("User with that username already exists!");
         }
@@ -57,7 +76,7 @@ public class UserService {
 
         userRepository.save(user);
         printSuccess("Successfully created user: " + userRequestDTO.getUsername());
-        return mapToDTO(user);
+        return dtoMapper.mapToDTO(user);
     }
 
 
@@ -66,14 +85,14 @@ public class UserService {
         List<User> users = userRepository.findAll();
 
         for (User user : users) {
-            userDTOS.add(mapToDTO(user));
+            userDTOS.add(dtoMapper.mapToDTO(user));
         }
 
         return userDTOS;
     }
 
     public UserDTO getUser(String username) {
-        return mapToDTO(userRepository.findByUsername(username).orElseThrow());
+        return dtoMapper.mapToDTO(userRepository.findByUsername(username).orElseThrow());
     }
 
 
@@ -90,7 +109,7 @@ public class UserService {
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             String role = user.getRole().getName();
-            printSuccess("Successfully logged in as" + username + " with a role: " + role);
+            printSuccess("Successfully logged in as " + username + " with a role: " + role);
             return role;
         } else {
             throw new RuntimeException("Wrong password!");

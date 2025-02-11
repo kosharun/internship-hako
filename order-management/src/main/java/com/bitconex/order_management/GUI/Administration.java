@@ -38,15 +38,24 @@ public class Administration {
     public void startAdminConsole() {
         while (true) {
 
-            print("\n🔹 ADMIN PANEL 🔹");
-            print("1. Create New User");
-            print("2. View All Users");
-            print("3. Remove An User");
-            print("4. Exit");
+            int choice;
+            while (true) {
+                try {
+                    print("\n🔹 ADMIN PANEL 🔹");
+                    print("1. Create New User");
+                    print("2. View All Users");
+                    print("3. Remove An User");
+                    print("4. Exit");
 
-            print("Select an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+                    print("Select an option: ");
+                    choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume leftover newline
+                    break;
+                } catch (Exception e) {
+                    printError("The input should be a number!");
+                    scanner.nextLine(); // 🔹 Clear invalid input to avoid infinite loop
+                }
+            }
 
             switch (choice) {
                 case 1:
@@ -55,6 +64,7 @@ public class Administration {
                     } catch (Exception e) {
                         printError("Error creating user - " + e.getMessage());
                     }
+
                     break;
                 case 2:
                     try {
@@ -67,15 +77,15 @@ public class Administration {
                     removeUser();
                     break;
                 case 4:
-                    System.out.println("Exiting Admin Panel...");
+                    print("Exiting Admin Panel...");
                     return;
                 default:
-                    System.out.println("❌ Invalid choice. Try again.");
+                    printError("Invalid choice. Try again.");
             }
         }
     }
 
-    void createUser() {
+    void createUser() throws Exception {
         print("Enter a Username: ");
         String username = scanner.nextLine();
 
@@ -92,11 +102,23 @@ public class Administration {
         String lastName = scanner.nextLine();
 
         print("Enter a Role (ADMIN, USER): ");
-        String roleName = scanner.nextLine();
-        Optional<Role> role = roleRepository.findByName(roleName);
+        String roleName = scanner.nextLine().toUpperCase();
+        Optional<Role> role = roleRepository.findByName(roleName);              //MOZDA DA SE NE KORISTI ROLEREPOSITORY DIREKT
+
+        if(role.isEmpty()) {
+            throw new Exception("Role not found!");
+        }
 
         print("Enter Date Of Birth (yyyy-mm-dd): ");
-        String dateOfBirth = scanner.nextLine();
+        String dateOfBirthStr = scanner.nextLine();
+
+        LocalDate dateOfBirth;
+        try {
+            dateOfBirth = LocalDate.parse(dateOfBirthStr);
+        } catch (Exception e) {
+            printError("Invalid date format. Use yyyy-MM-dd.");
+            return;
+        }
 
         print("Enter user's address.");
         print("Enter a Street:");
@@ -117,6 +139,7 @@ public class Administration {
         address.setPlaceName(placeName);
         address.setStateName(stateName);
 
+
         UserRequestDTO userRequestDTO = UserRequestDTO.builder()
                 .username(username)
                 .password(password)
@@ -125,14 +148,13 @@ public class Administration {
                 .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
-                .dateOfBirth(LocalDate.parse(dateOfBirth))
+                .dateOfBirth(dateOfBirth)
                 .build();
 
         userService.createUser(userRequestDTO);
     }
 
     void getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
 
         // Konfigurisanje ObjectMapper-a
         ObjectMapper objectMapper = new ObjectMapper();
@@ -140,10 +162,11 @@ public class Administration {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Lijep format
 
         try {
+            List<UserDTO> users = userService.getAllUsers();
             String jsonOutput = objectMapper.writeValueAsString(users);
             print(jsonOutput);
         } catch (Exception e) {
-            throw new RuntimeException("Error converting to JSON: " + e.getMessage());
+            throw new RuntimeException("Error retrieving users: " + e.getMessage());
         }
 
     }
@@ -154,7 +177,7 @@ public class Administration {
         try {
            userService.deleteUser(username);
         } catch (Exception e) {
-            throw new RuntimeException("Error removing user " + e.getMessage());
+            printError("Error removing user: " + e.getMessage());
         }
     }
 }

@@ -265,5 +265,6 @@ class UserServiceTests {
 
         assertThrows(Throwable.class, () -> userService.login("runha", "password123"));
     }
+
 }
 

@@ -26,14 +26,18 @@ public class MainMenu {
         print("Welcome to Order Management System!");
         String role = "";
         while (role.isEmpty()) {
-            print("Enter Username: ");
-            String username = scanner.nextLine();
+            try {
+                print("Enter Username: ");
+                String username = scanner.nextLine();
 
-            print("Enter Password: ");
-            String password = scanner.nextLine();
+                print("Enter Password: ");
+                String password = scanner.nextLine();
 
-            // Simulate role checking (Replace with real authentication logic)
-            role = userService.login(username, password);
+                // Simulate role checking (Replace with real authentication logic)
+                role = userService.login(username, password);
+            } catch (Exception e) {
+                printError("Error logging in: " + e.getMessage());
+            }
 
             print("");
             if (role.isEmpty()) {
@@ -45,7 +49,8 @@ public class MainMenu {
 
         if("ADMIN".matches(role)) {
             administrationConsole.startAdminConsole();
-            printSuccess("Logged in as " + sessionManager.getCurrentUserRole());
+        } else if ("USER".matches(role)) {
+
         }
 
     }
