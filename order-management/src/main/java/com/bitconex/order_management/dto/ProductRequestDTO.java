@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ProductRequestDTO {
 
-    @NotNull
     private Catalog catalog;
 
     @NotBlank(message = "Product name cannot be empty!")

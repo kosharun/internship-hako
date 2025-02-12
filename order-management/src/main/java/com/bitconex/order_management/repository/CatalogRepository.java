@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CatalogRepository extends JpaRepository<Catalog, Long> {
     Optional<Catalog> findByName(String name);
-    Optional<Catalog> findFirstByOrderById(); // 🔹 Fetch the first (default) catalog
+    Optional<Catalog> findFirstByOrderByCatalogId(); // 🔹 Fetch the first (default) catalog
 }

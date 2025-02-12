@@ -12,10 +12,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import org.springframework.stereotype.Service;
+
 import java.util.Set;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
 
+@Service
 public class ProductService {
     private final ProductRepository productRepository;
     private final CatalogRepository catalogRepository;
@@ -37,7 +40,7 @@ public class ProductService {
             throw new ConstraintViolationException(errorMessage.toString(), violations);
         }
 
-        Catalog catalog = catalogRepository.findFirstByOrderById().orElseThrow(() -> new RuntimeException("Default catalog not found!"));
+        Catalog catalog = catalogRepository.findFirstByOrderByCatalogId().orElseThrow(() -> new RuntimeException("Default catalog not found!"));
 
         Product product = Product.builder()
                 .catalog(catalog)
