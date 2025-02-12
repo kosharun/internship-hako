@@ -22,23 +22,13 @@ import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CatalogRepository catalogRepository;
-    private final Validator validator; // 🔹 Inject Validator
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, Validator validator) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
-        this.validator = validator;
     }
 
-    public Product createProduct(@Valid ProductRequestDTO productRequestDTO) {
-        Set<ConstraintViolation<ProductRequestDTO>> violations = validator.validate(productRequestDTO);
-        if (!violations.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder("Validation failed: ");
-            for (ConstraintViolation<ProductRequestDTO> violation : violations) {
-                errorMessage.append(violation.getPropertyPath()).append(" ").append(violation.getMessage()).append("; ");
-            }
-            throw new ConstraintViolationException(errorMessage.toString(), violations);
-        }
+    public Product createProduct(ProductRequestDTO productRequestDTO) {
 
         Catalog catalog = catalogRepository.findFirstByOrderByCatalogId().orElseThrow(() -> new RuntimeException("Default catalog not found!"));
 

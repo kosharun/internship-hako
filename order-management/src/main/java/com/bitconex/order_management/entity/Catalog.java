@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Catalog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
