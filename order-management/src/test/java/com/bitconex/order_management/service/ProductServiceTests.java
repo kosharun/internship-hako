@@ -17,8 +17,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTests {
@@ -68,5 +69,28 @@ public class ProductServiceTests {
         assertThat(productFinal).isNotNull();
         assertThat(productFinal.getName()).isEqualTo("Mock Product Name");
 
+    }
+
+    @Test
+    @DisplayName("Should throw exception if catalog is not found")
+    void testCreateProduct_ShouldThrowException_WhenCatalogNotFound() {
+
+        when(catalogRepository.findFirstByOrderByCatalogId()).thenReturn(Optional.empty());
+
+        // Create a mock ProductRequestDTO
+        ProductRequestDTO productRequestDTO = ProductRequestDTO.builder()
+                .name("Mock Product Name")
+                .description("This is a mock description for testing.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))
+                .availableUntil(LocalDate.of(2025, 2, 1))
+                .stockQuantity(50)
+                .build();
+
+
+        //Check
+        assertThrows(RuntimeException.class, () -> productService.createProduct(productRequestDTO));
+
+        verify(productRepository, never()).save(any(Product.class));
     }
 }
