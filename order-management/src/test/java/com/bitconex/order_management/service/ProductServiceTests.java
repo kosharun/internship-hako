@@ -93,4 +93,19 @@ public class ProductServiceTests {
 
         verify(productRepository, never()).save(any(Product.class));
     }
+
+    @Test
+    @DisplayName("Should fail when name is missing")
+    void testCreateProduct_ShouldFail_WhenNameIsMissing() {
+        ProductRequestDTO productRequestDTO = ProductRequestDTO.builder()
+                .description("Mock Description")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))
+                .availableUntil(LocalDate.of(2025, 2, 1))
+                .stockQuantity(50)
+                .build();
+
+        assertThrows(Exception.class, () -> productService.createProduct(productRequestDTO));
+    }
+
 }
