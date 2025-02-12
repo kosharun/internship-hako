@@ -14,6 +14,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
@@ -46,4 +47,19 @@ public class ProductService {
         printSuccess("Successfully created product: " + productRequestDTO.getName());
         return product;
     }
+
+    public List<Product> getAllProducts() throws Exception {
+        List<Product> products = productRepository.findAll();
+        if(products.isEmpty()) {
+            throw new Exception("Products not found!");
+        }
+
+        return products;
+    }
+
+    public Product getProductById(Long Id) throws Exception {
+        return productRepository.findById(Id).orElseThrow(() -> new Exception("Cannot find product"));
+    }
+
+
 }
