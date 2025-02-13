@@ -48,17 +48,17 @@ public class ProductService {
         return product;
     }
 
-    public List<Product> getAllProducts() throws Exception {
+    public List<Product> getAllProducts() {
         List<Product> products = productRepository.findAll();
         if(products.isEmpty()) {
-            throw new Exception("Products not found!");
+            throw new RuntimeException("Products not found!");
         }
 
         return products;
     }
 
-    public Product getProductById(Long Id) throws Exception {
-        return productRepository.findById(Id).orElseThrow(() -> new Exception("Cannot find product"));
+    public Product getProductById(Long Id)  {
+        return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find product"));
     }
 
 

@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,9 @@ public class ProductServiceTests {
 
     @InjectMocks
     private ProductService productService;
+
+
+    // CREATE TESTS
 
     @Test
     @DisplayName("Should create product")
@@ -109,5 +113,57 @@ public class ProductServiceTests {
     }
 
 
+    //GET TESTS
+
+    @Test
+    @DisplayName("Should retrieve all products")
+    void testGetAllProducts_ShouldReturnAllProducts() {
+        Product product1 = Product.builder()
+                .name("Mock Product Name")
+                .description("This is a mock description for testing.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))  // Example date
+                .availableUntil(LocalDate.of(2025, 2, 1))  // Future date
+                .stockQuantity(50)  // Example stock
+                .build();
+        Product product2 = Product.builder()
+                .name("Mock Product Name2")
+                .description("This is a mock description for testing 2.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))  // Example date
+                .availableUntil(LocalDate.of(2025, 2, 1))  // Future date
+                .stockQuantity(50)  // Example stock
+                .build();
+
+        List<Product> products = List.of(product1, product2);
+
+        when(productRepository.findAll()).thenReturn(products);
+
+
+        List<Product> productsFinal = productService.getAllProducts();
+
+        assertThat(productsFinal).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Should retrieve a product by id")
+    void testGetProduct_ShouldReturnAProduct() {
+        Product product = Product.builder()
+                .name("Mock Product Name")
+                .description("This is a mock description for testing.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))  // Example date
+                .availableUntil(LocalDate.of(2025, 2, 1))  // Future date
+                .stockQuantity(50)  // Example stock
+                .build();
+
+
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        Product productFinal = productService.getProductById(product.getProductId());
+
+        assertThat(productFinal).isNotNull();
+        assertThat(productFinal.getName()).isEqualTo("Mock Product Name");
+    }
 
 }
