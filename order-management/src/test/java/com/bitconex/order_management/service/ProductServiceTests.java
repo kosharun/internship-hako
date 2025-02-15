@@ -147,7 +147,7 @@ public class ProductServiceTests {
 
     @Test
     @DisplayName("Should retrieve a product by id")
-    void testGetProduct_ShouldReturnAProduct() {
+    void testGetProductById_ShouldReturnAProduct() {
         Product product = Product.builder()
                 .name("Mock Product Name")
                 .description("This is a mock description for testing.")
@@ -164,6 +164,22 @@ public class ProductServiceTests {
 
         assertThat(productFinal).isNotNull();
         assertThat(productFinal.getName()).isEqualTo("Mock Product Name");
+    }
+
+    @Test
+    @DisplayName("Should throw exception when no products")
+    void testGetAllProducts_ShouldThrowException_WhenNoProducts() {
+        when(productRepository.findAll()).thenReturn(List.of());
+
+        assertThrows(Exception.class, () -> productService.getAllProducts());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when no product")
+    void testGetProductById_ShouldThrowException_WhenNoProduct() {
+        when(productRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> productService.getProductById(2L));
     }
 
 }

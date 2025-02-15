@@ -88,6 +88,8 @@ public class UserService {
             userDTOS.add(dtoMapper.mapToDTO(user));
         }
 
+        print(userDTOS.toString());
+
         return userDTOS;
     }
 

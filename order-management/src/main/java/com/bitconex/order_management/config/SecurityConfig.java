@@ -27,8 +27,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Isključujemo CSRF zaštitu jer koristimo REST API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users").hasRole("ADMIN") // Samo ADMIN može vidjeti listu korisnika
-                        .requestMatchers("/products").permitAll() // Svi mogu vidjeti listu proizvoda
+                        .requestMatchers("/users").permitAll() // Samo ADMIN može vidjeti listu korisnika
+                        .requestMatchers("/products/**").permitAll() // Svi mogu vidjeti listu proizvoda
                         .requestMatchers("/orders").authenticated() // Samo prijavljeni korisnici mogu vidjeti narudžbe
                         .anyRequest().authenticated()
                 );
