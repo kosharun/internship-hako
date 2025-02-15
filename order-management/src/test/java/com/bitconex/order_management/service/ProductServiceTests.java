@@ -5,6 +5,7 @@ import com.bitconex.order_management.entity.Catalog;
 import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.CatalogRepository;
+import com.bitconex.order_management.repository.OrderItemRepository;
 import com.bitconex.order_management.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,6 +32,9 @@ public class ProductServiceTests {
 
     @Mock
     private CatalogRepository catalogRepository;
+
+    @Mock
+    private OrderItemRepository orderItemRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -181,5 +187,48 @@ public class ProductServiceTests {
 
         assertThrows(Exception.class, () -> productService.getProductById(2L));
     }
+
+
+    //REMOVE TESTS
+
+    @Test
+    @DisplayName("Should remove a product")
+    void testRemoveProduct_ShouldRemoveProduct() {
+        Product product = Product.builder()
+                .name("Mock Product Name")
+                .description("This is a mock description for testing.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))  // Example date
+                .availableUntil(LocalDate.of(2025, 2, 1))  // Future date
+                .stockQuantity(50)  // Example stock
+                .build();
+
+
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        productService.removeProduct(product.getProductId());
+
+        verify(orderItemRepository, times(1)).deleteByProduct(product);
+        verify(productRepository, times(1)).delete(product);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when no product")
+    void testRemoveProduct_ShouldThrowException_WhenNoProduct() {
+        Product product = Product.builder()
+                .name("Mock Product Name")
+                .description("This is a mock description for testing.")
+                .price(99.99)
+                .datePublished(LocalDate.of(2024, 2, 1))
+                .availableUntil(LocalDate.of(2025, 2, 1))
+                .stockQuantity(50)
+                .build();
+
+
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> productService.removeProduct(product.getProductId()));
+    }
+
 
 }
