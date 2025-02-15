@@ -1,6 +1,8 @@
 package com.bitconex.order_management.GUI;
 
 
+import com.bitconex.order_management.GUI.ADMIN.Administration;
+import com.bitconex.order_management.GUI.ADMIN.MainAdmin;
 import com.bitconex.order_management.service.UserService;
 import com.bitconex.order_management.utils.SessionManager;
 import org.springframework.stereotype.Component;
@@ -14,12 +16,12 @@ public class MainMenu {
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService;
     private final SessionManager sessionManager;
-    private final Administration administrationConsole;
+    private final MainAdmin mainAdmin;
 
-    public MainMenu(UserService userService, SessionManager sessionManager, Administration administrationConsole) {
+    public MainMenu(UserService userService, SessionManager sessionManager, MainAdmin mainAdmin) {
         this.userService = userService;
         this.sessionManager = sessionManager;
-        this.administrationConsole = administrationConsole;
+        this.mainAdmin = mainAdmin;
     }
 
     public void start() {
@@ -48,7 +50,7 @@ public class MainMenu {
         sessionManager.setCurrentUserRole(role);
 
         if("ADMIN".matches(role)) {
-            administrationConsole.startAdminConsole();
+            mainAdmin.startAdminConsole();
         } else if ("USER".matches(role)) {
 
         }

@@ -1,8 +1,7 @@
-package com.bitconex.order_management.GUI;
+package com.bitconex.order_management.GUI.ADMIN;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.*;
 
-import com.bitconex.order_management.dto.AddressDTO;
 import com.bitconex.order_management.dto.UserDTO;
 import com.bitconex.order_management.dto.UserRequestDTO;
 import com.bitconex.order_management.entity.Address;
@@ -13,7 +12,6 @@ import com.bitconex.order_management.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -35,13 +33,13 @@ public class Administration {
         this.userService = userService;
     }
 
-    public void startAdminConsole() {
+    public void startUserAdminConsole() {
         while (true) {
 
             int choice;
             while (true) {
                 try {
-                    print("\n🔹 ADMIN PANEL 🔹");
+                    print("\n🔹 USER ADMINISTRATION 🔹");
                     print("1. Create New User");
                     print("2. View All Users");
                     print("3. Remove An User");
@@ -77,7 +75,7 @@ public class Administration {
                     removeUser();
                     break;
                 case 4:
-                    print("Exiting Admin Panel...");
+                    print("Exiting User Administration...");
                     return;
                 default:
                     printError("Invalid choice. Try again.");
