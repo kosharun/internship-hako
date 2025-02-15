@@ -14,11 +14,9 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final BCryptPasswordEncoder passwordEncoder; // ✅ Inject BCryptPasswordEncoder
 
-    public UserController(UserService userService, BCryptPasswordEncoder passwordEncoder) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
@@ -29,11 +27,6 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @GetMapping("/pass")
-    public ResponseEntity<String> generateEncodedPassword() {
-        return ResponseEntity.ok(passwordEncoder.encode("securepassword")); // ✅ Correct way to encode
     }
 
     @DeleteMapping("/{username}")

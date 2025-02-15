@@ -7,6 +7,7 @@ import com.bitconex.order_management.entity.Catalog;
 import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.repository.CatalogRepository;
+import com.bitconex.order_management.repository.OrderItemRepository;
 import com.bitconex.order_management.repository.ProductRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -15,6 +16,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +29,12 @@ import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CatalogRepository catalogRepository;
+    private final OrderItemRepository orderItemRepository;
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     public Product createProduct(ProductRequestDTO productRequestDTO) {
@@ -65,12 +69,17 @@ public class ProductService {
         return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find product"));
     }
 
-    public void removeProduct(Long Id) {
-        Product product = productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find product!"));
+    @Transactional
+    public void removeProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cannot find product!"));
+
+        orderItemRepository.deleteByProduct(product); // Ovo mora postojati u repository-ju
 
         productRepository.delete(product);
         printSuccess("Successfully removed product: " + product.getName());
     }
+
 
 
 }

@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users").permitAll() // Samo ADMIN može vidjeti listu korisnika
                         .requestMatchers("/products/**").permitAll() // Svi mogu vidjeti listu proizvoda
-                        .requestMatchers("/orders").authenticated() // Samo prijavljeni korisnici mogu vidjeti narudžbe
+                        .requestMatchers("/orders").permitAll() // Samo prijavljeni korisnici mogu vidjeti narudžbe
                         .anyRequest().authenticated()
                 );
 
