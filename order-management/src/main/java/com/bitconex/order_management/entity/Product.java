@@ -22,7 +22,7 @@ public class Product {
     private String name;
     private String description;
     private double price;
-    private LocalDate datePublished;
+    private LocalDate datePublished = LocalDate.now();
     private LocalDate availableUntil;
     private int stockQuantity;
 }

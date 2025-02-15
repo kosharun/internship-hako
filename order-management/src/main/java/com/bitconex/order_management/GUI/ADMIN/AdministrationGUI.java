@@ -20,14 +20,14 @@ import java.util.Optional;
 import java.util.Scanner;
 
 @Component
-public class Administration {
+public class AdministrationGUI {
     private final Scanner scanner = new Scanner(System.in);
     private final RoleRepository roleRepository;
     private final AddressRepository addressRepository;
     private final UserService userService;
 
 
-    public Administration(RoleRepository roleRepository, AddressRepository addressRepository, UserService userService) {
+    public AdministrationGUI(RoleRepository roleRepository, AddressRepository addressRepository, UserService userService) {
         this.roleRepository = roleRepository;
         this.addressRepository = addressRepository;
         this.userService = userService;

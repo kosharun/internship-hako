@@ -28,9 +28,9 @@ public class ProductRequestDTO {
     @Positive(message = "Price must be a positive number!")
     private double price;
 
-    @NotNull(message = "Date published is required!")
+    @Builder.Default
     @PastOrPresent(message = "Date published cannot be in the future!")
-    private LocalDate datePublished;
+    private LocalDate datePublished = LocalDate.now();
 
     @NotNull(message = "Available until date is required!")
     @Future(message = "Available until date must be in the future!")

@@ -8,12 +8,14 @@ import static com.bitconex.order_management.utils.ConsoleUtil.print;
 import static com.bitconex.order_management.utils.ConsoleUtil.printError;
 
 @Component
-public class MainAdmin {
+public class MainAdminGUI {
     private final Scanner scanner = new Scanner(System.in);
-    private final Administration administration;
+    private final AdministrationGUI administrationGUI;
+    private final ProductCatalogGUI productCatalogGUI;
 
-    public MainAdmin(Administration administration) {
-        this.administration = administration;
+    public MainAdminGUI(AdministrationGUI administrationGUI, ProductCatalogGUI productCatalogGUI) {
+        this.administrationGUI = administrationGUI;
+        this.productCatalogGUI = productCatalogGUI;
     }
 
 
@@ -42,7 +44,7 @@ public class MainAdmin {
             switch (choice) {
                 case 1:
                     try {
-                        administration.startUserAdminConsole();
+                        administrationGUI.startUserAdminConsole();
                     } catch (Exception e) {
                         printError("Error creating user - " + e.getMessage());
                     }
@@ -50,7 +52,7 @@ public class MainAdmin {
                     break;
                 case 2:
                     try {
-
+                        productCatalogGUI.startProductCatalogConsole();
                     } catch (Exception e) {
                         printError("Error fetching users - " + e.getMessage());
                     }
