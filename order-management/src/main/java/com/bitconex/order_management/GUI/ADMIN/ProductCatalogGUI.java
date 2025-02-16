@@ -2,14 +2,18 @@ package com.bitconex.order_management.GUI.ADMIN;
 
 import com.bitconex.order_management.dto.ProductRequestDTO;
 
+import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.service.ProductService;
+import com.github.freva.asciitable.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
-import static com.bitconex.order_management.utils.ConsoleUtil.print;
-import static com.bitconex.order_management.utils.ConsoleUtil.printError;
+import static com.bitconex.order_management.utils.ConsoleUtil.*;
+
 
 @Component
 public class ProductCatalogGUI {
@@ -26,6 +30,7 @@ public class ProductCatalogGUI {
             int choice;
             while (true) {
                 try {
+
                     print("\n🔹 PRODUCT CATALOG 🔹");
                     print("1. Create New Product");
                     print("2. View All Products");
@@ -49,10 +54,10 @@ public class ProductCatalogGUI {
                     } catch (Exception e) {
                         printError("Error creating product - " + e.getMessage());
                     }
-
                     break;
                 case 2:
                     try {
+                        getAllProducts();
                     } catch (Exception e) {
                         printError("Error fetching products - " + e.getMessage());
                     }
@@ -108,5 +113,59 @@ public class ProductCatalogGUI {
             printError("Invalid date format. Use yyyy-MM-dd.");
         }
     }
+
+    void getAllProducts() {
+        List<Product> products = productService.getAllProducts();
+        if (products.isEmpty()) {
+            printInfo("No available products!");
+            return;
+        }
+
+        String table = AsciiTable.getTable(products, Arrays.asList(
+                new Column()
+                        .header("ID")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> String.valueOf(product.getProductId())),
+                new Column()
+                        .header("Catalog")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.LEFT)
+                        .with(product -> product.getCatalog() != null ? product.getCatalog().getName() : "N/A"),
+                new Column()
+                        .header("Name")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.LEFT)
+                        .with(Product::getName),
+                new Column()
+                        .header("Description")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.LEFT)
+                        .with(product -> product.getDescription() != null ? product.getDescription() : "N/A"),
+                new Column()
+                        .header("Price")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.RIGHT)
+                        .with(product -> String.format("%.2f", product.getPrice())),
+                new Column()
+                        .header("Published")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> product.getDatePublished() != null ? product.getDatePublished().toString() : "N/A"),
+                new Column()
+                        .header("Available Until")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> product.getAvailableUntil() != null ? product.getAvailableUntil().toString() : "Indefinite"),
+                new Column()
+                        .header("Stock")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> String.valueOf(product.getStockQuantity()))
+        ));
+
+        print(table);
+    }
+
 
 }
