@@ -1,5 +1,6 @@
 package com.bitconex.order_management.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,5 +21,6 @@ public class OrderStatus {
     private String name;
 
     @OneToMany(mappedBy = "status", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Order> orders;
 }

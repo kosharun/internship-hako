@@ -1,10 +1,7 @@
 package com.bitconex.order_management.service;
 
 import com.bitconex.order_management.dto.OrderDTO;
-import com.bitconex.order_management.dto.UserDTO;
 import com.bitconex.order_management.entity.Order;
-import com.bitconex.order_management.entity.OrderDTO;
-import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.OrderRepository;
 import org.springframework.stereotype.Service;

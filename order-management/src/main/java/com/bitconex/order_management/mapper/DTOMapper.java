@@ -38,7 +38,9 @@ public class DTOMapper {
     }
 
     public OrderDTO mapToDTO(Order order) {
-        return modelMapper.map(order, OrderDTO.class);
+        OrderDTO orderDTO = modelMapper.map(order, OrderDTO.class);
+        orderDTO.setUserId(order.getUser().getUserId());
+        return orderDTO;
     }
 
     public OrderItemDTO mapToDTO(OrderItem orderItem) {

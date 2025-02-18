@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class OrderDTO {
-    private User user;
+    private Long userId;
     private OrderStatus status;
 
     private double totalPrice;
