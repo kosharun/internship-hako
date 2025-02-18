@@ -1,5 +1,6 @@
 package com.bitconex.order_management.GUI.ADMIN;
 
+import com.bitconex.order_management.dto.OrderItemDTO;
 import com.bitconex.order_management.dto.ProductRequestDTO;
 
 import com.bitconex.order_management.entity.Product;
@@ -63,6 +64,11 @@ public class ProductCatalogGUI {
                     }
                     break;
                 case 3:
+                    try {
+                        removeProduct();
+                    } catch (Exception e) {
+                        printError("Error removing product - " + e.getMessage());
+                    }
                     break;
                 case 4:
                     print("Exiting Product Catalog...");
@@ -166,6 +172,54 @@ public class ProductCatalogGUI {
 
         print(table);
     }
+
+    void removeProduct() {
+        getAllProducts();
+
+        print("Type in the ID of the product you want to remove: ");
+        Long Id = scanner.nextLong();
+        scanner.nextLine();
+
+        List<OrderItemDTO> orderItemDTOS = productService.findOrderItemsRelatedToProduct(Id);
+
+        if (!orderItemDTOS.isEmpty()) {
+            printInfo("This product is associated with the following order items:");
+
+            String table = AsciiTable.getTable(orderItemDTOS, Arrays.asList(
+                    new Column()
+                            .header("Order ID")
+                            .headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.CENTER)
+                            .with(orderItem -> String.valueOf(orderItem.getOrderId())),
+                    new Column()
+                            .header("Product ID")
+                            .headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.CENTER)
+                            .with(orderItem -> String.valueOf(orderItem.getProductId())),
+                    new Column()
+                            .header("Quantity")
+                            .headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.RIGHT)
+                            .with(orderItem -> String.valueOf(orderItem.getQuantity()))
+            ));
+
+            print(table);
+
+            print("Are you sure you want to remove this product? (yes/no)");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+
+            if (!confirmation.equals("yes")) {
+                printInfo("Product removal canceled.");
+                return;
+            }
+        }
+
+        productService.removeProduct(Id);
+        printSuccess("Product removed successfully.");
+    }
+
+
+
 
 
 }

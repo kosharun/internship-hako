@@ -1,5 +1,6 @@
 package com.bitconex.order_management.service;
 
+import com.bitconex.order_management.dto.OrderItemDTO;
 import com.bitconex.order_management.dto.ProductRequestDTO;
 import com.bitconex.order_management.dto.UserDTO;
 import com.bitconex.order_management.dto.UserRequestDTO;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.print;
@@ -30,11 +32,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CatalogRepository catalogRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderItemService orderItemService;
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, OrderItemService orderItemService) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
         this.orderItemRepository = orderItemRepository;
+        this.orderItemService = orderItemService;
     }
 
     public Product createProduct(ProductRequestDTO productRequestDTO) {
@@ -79,6 +83,13 @@ public class ProductService {
         productRepository.delete(product);
         printSuccess("Successfully removed product: " + product.getName());
     }
+
+    public List<OrderItemDTO> findOrderItemsRelatedToProduct(Long Id) {
+        Optional<Product> product = productRepository.findById(Id);
+        return orderItemService.findOrderItemsRelatedToProduct(product.get());
+    }
+
+
 
 
 
