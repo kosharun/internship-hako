@@ -1,13 +1,10 @@
 package com.bitconex.order_management.mapper;
 
-import com.bitconex.order_management.dto.OrderItemDTO;
-import com.bitconex.order_management.dto.ProductRequestDTO;
-import com.bitconex.order_management.dto.UserDTO;
-import com.bitconex.order_management.dto.UserRequestDTO;
+import com.bitconex.order_management.dto.*;
+import com.bitconex.order_management.entity.Order;
 import com.bitconex.order_management.entity.OrderItem;
 import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.entity.User;
-import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Component;
@@ -38,6 +35,10 @@ public class DTOMapper {
 
     public ProductRequestDTO mapToDTO(Product product) {
         return modelMapper.map(product, ProductRequestDTO.class);
+    }
+
+    public OrderDTO mapToDTO(Order order) {
+        return modelMapper.map(order, OrderDTO.class);
     }
 
     public OrderItemDTO mapToDTO(OrderItem orderItem) {
