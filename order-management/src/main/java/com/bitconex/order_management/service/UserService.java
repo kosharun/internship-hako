@@ -1,6 +1,7 @@
 package com.bitconex.order_management.service;
 
 import com.bitconex.order_management.dto.AddressDTO;
+import com.bitconex.order_management.dto.UserAdminRequestDTO;
 import com.bitconex.order_management.dto.UserDTO;
 import com.bitconex.order_management.dto.UserRequestDTO;
 import com.bitconex.order_management.entity.Address;
@@ -76,6 +77,35 @@ public class UserService {
 
         userRepository.save(user);
         printSuccess("Successfully created user: " + userRequestDTO.getUsername());
+        return dtoMapper.mapToDTO(user);
+    }
+
+    public UserDTO createAdmin(@Valid UserAdminRequestDTO userAdminRequestDTO) {
+        Set<ConstraintViolation<UserAdminRequestDTO>> violations = validator.validate(userAdminRequestDTO);
+        if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder("Validation failed: ");
+            for (ConstraintViolation<UserAdminRequestDTO> violation : violations) {
+                errorMessage.append(violation.getPropertyPath()).append(" ").append(violation.getMessage()).append("; ");
+            }
+            throw new ConstraintViolationException(errorMessage.toString(), violations);
+        }
+
+        if(userRepository.findByUsername(userAdminRequestDTO.getUsername()).isPresent()) {
+            throw new RuntimeException("User with that username already exists!");
+        }
+
+        User user = new User();
+        user.setUsername(userAdminRequestDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(userAdminRequestDTO.getPassword()));
+        user.setEmail(userAdminRequestDTO.getEmail());
+
+        Role role = roleRepository.findByName(userAdminRequestDTO.getRole().getName())
+                .orElseThrow(() -> new RuntimeException("Role not found!"));
+
+        user.setRole(role);
+        userRepository.save(user);
+
+        printSuccess("Successfully created user: " + userAdminRequestDTO.getUsername());
         return dtoMapper.mapToDTO(user);
     }
 

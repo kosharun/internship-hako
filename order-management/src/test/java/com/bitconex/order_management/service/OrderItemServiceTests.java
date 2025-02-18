@@ -12,11 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderItemServiceTests {
@@ -58,4 +57,22 @@ public class OrderItemServiceTests {
 
         assertThat(testOrderItems).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Should return empty list when no Order Items are found for the product")
+    void testFindOrderItemsRelatedToProduct_ShouldReturnEmptyList() {
+
+        Product product = Product.builder()
+                .name("non-existent product")
+                .build();
+
+        when(orderItemRepository.findAllByProduct(product)).thenReturn(List.of());
+
+        List<OrderItemDTO> testOrderItems = orderItemService.findOrderItemsRelatedToProduct(product);
+
+        assertThat(testOrderItems).isEmpty();
+        verify(dtoMapper, never()).mapToDTO(any(OrderItem.class));
+    }
+
+
 }
