@@ -2,10 +2,9 @@ package com.bitconex.order_management.dto;
 
 import com.bitconex.order_management.entity.OrderItem;
 import com.bitconex.order_management.entity.OrderStatus;
-import com.bitconex.order_management.entity.User;
-import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -19,5 +18,5 @@ public class OrderDTO {
     private List<OrderItem> orderItems;
 
     private double totalPrice;
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 }

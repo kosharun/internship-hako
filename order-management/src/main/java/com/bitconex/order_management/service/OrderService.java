@@ -32,4 +32,8 @@ public class OrderService {
         return orderDTOS;
     }
 
+    public Order createOrder(Order order) {
+        return orderRepository.save(order);
+    }
+
 }
