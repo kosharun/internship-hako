@@ -50,4 +50,7 @@ public class DTOMapper {
     public User mapToEntity(UserRequestDTO userRequestDTO) {
         return modelMapper.map(userRequestDTO, User.class);
     }
+    public OrderItem mapToEntity(OrderItemDTO orderItemDTO) {
+        return modelMapper.map(orderItemDTO, OrderItem.class);
+    }
 }

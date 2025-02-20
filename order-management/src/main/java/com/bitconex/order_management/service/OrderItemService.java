@@ -31,4 +31,11 @@ public class OrderItemService {
     }
 
 
+    public OrderItemDTO createOrderItem(OrderItemDTO orderItemDTO) {
+        OrderItem orderItem = dtoMapper.mapToEntity(orderItemDTO);
+        OrderItem savedOrderItem = orderItemRepository.save(orderItem);
+        return dtoMapper.mapToDTO(savedOrderItem);
+    }
+
+
 }
