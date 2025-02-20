@@ -4,6 +4,7 @@ import com.bitconex.order_management.dto.OrderDTO;
 import com.bitconex.order_management.dto.OrderRequestDTO;
 import com.bitconex.order_management.entity.Order;
 import com.bitconex.order_management.entity.OrderStatus;
+import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.OrderRepository;
@@ -41,6 +42,10 @@ public class OrderService {
         }
 
         return orderDTOS;
+    }
+
+    public Order getOrderById(Long Id)  {
+        return orderRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find order"));
     }
 
     public OrderDTO createOrder(OrderRequestDTO orderRequestDTO) {

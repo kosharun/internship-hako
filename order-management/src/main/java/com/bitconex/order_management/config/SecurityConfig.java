@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/users").permitAll() // Samo ADMIN može vidjeti listu korisnika
                         .requestMatchers("/products/**").permitAll() // Svi mogu vidjeti listu proizvoda
                         .requestMatchers("/orders").permitAll() // Samo prijavljeni korisnici mogu vidjeti narudžbe
+                        .requestMatchers("/orderItems").permitAll()
                         .anyRequest().authenticated()
                 );
 

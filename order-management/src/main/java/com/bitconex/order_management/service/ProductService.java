@@ -5,8 +5,10 @@ import com.bitconex.order_management.dto.ProductRequestDTO;
 import com.bitconex.order_management.dto.UserDTO;
 import com.bitconex.order_management.dto.UserRequestDTO;
 import com.bitconex.order_management.entity.Catalog;
+import com.bitconex.order_management.entity.OrderItem;
 import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.entity.User;
+import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.CatalogRepository;
 import com.bitconex.order_management.repository.OrderItemRepository;
 import com.bitconex.order_management.repository.ProductRepository;
@@ -16,6 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +36,14 @@ public class ProductService {
     private final CatalogRepository catalogRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderItemService orderItemService;
+    private final DTOMapper dtoMapper;
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, OrderItemService orderItemService) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, @Lazy OrderItemService orderItemService, DTOMapper dtoMapper) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
         this.orderItemRepository = orderItemRepository;
         this.orderItemService = orderItemService;
+        this.dtoMapper = dtoMapper;
     }
 
     public Product createProduct(ProductRequestDTO productRequestDTO) {
@@ -86,7 +91,13 @@ public class ProductService {
 
     public List<OrderItemDTO> findOrderItemsRelatedToProduct(Long Id) {
         Optional<Product> product = productRepository.findById(Id);
-        return orderItemService.findOrderItemsRelatedToProduct(product.get());
+        List<OrderItem> orderItems = orderItemRepository.findAllByProduct(product.get());
+
+        if(orderItems.isEmpty()) {
+            throw new RuntimeException("No order items found for product: " + product.get().getName());
+        }
+
+        return orderItems.stream().map(dtoMapper::mapToDTO).toList();
     }
 
 
