@@ -53,4 +53,7 @@ public class DTOMapper {
     public OrderItem mapToEntity(OrderItemDTO orderItemDTO) {
         return modelMapper.map(orderItemDTO, OrderItem.class);
     }
+    public Order mapToEntity(OrderRequestDTO orderRequestDTO) {
+        return modelMapper.map(orderRequestDTO, Order.class);
+    }
 }

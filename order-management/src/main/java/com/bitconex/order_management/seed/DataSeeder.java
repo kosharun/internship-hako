@@ -259,7 +259,7 @@ public class DataSeeder implements CommandLineRunner {
             order.setUser(user.get());
             order.setStatus(status.get());
             order.setTotalPrice(totalPrice);
-            order.setCreatedAt(LocalDateTime.parse(createdAt));
+            order.setCreatedAt(LocalDate.parse(createdAt));
 
             orderRepository.save(order);
             System.out.println("✅ Order seeded for user: " + username);

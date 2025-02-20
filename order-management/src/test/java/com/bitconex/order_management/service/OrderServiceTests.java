@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class OrderServiceTests {
         order.setOrderId(100L);
         order.setUser(user);
         order.setTotalPrice(50.0);
-        order.setCreatedAt(LocalDateTime.now());
+        order.setCreatedAt(LocalDate.now());
 
         orderDTO = new OrderDTO();
         orderDTO.setUserId(1L);

@@ -18,6 +18,4 @@ public class OrderRequestDTO {
     private Long userId;
 
     private double totalPrice;
-
-    private LocalDate createdAt;
 }
