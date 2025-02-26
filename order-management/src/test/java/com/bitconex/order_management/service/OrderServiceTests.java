@@ -74,35 +74,7 @@ public class OrderServiceTests {
                 .build();
     }
 
-    @Test
-    @DisplayName("Should return list of OrderDTO when orders exist")
-    void testGetAllOrders_ShouldReturnOrderDTOList() {
-        when(orderRepository.findAll()).thenReturn(Arrays.asList(order));
-        when(dtoMapper.mapToDTO(order)).thenReturn(orderDTO);
-
-        List<OrderDTO> result = orderService.getAllOrders();
-
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUserId()).isEqualTo(1L);
-
-        verify(orderRepository, times(1)).findAll();
-        verify(dtoMapper, times(1)).mapToDTO(order);
-    }
-
-    @Test
-    @DisplayName("Should return empty list when no orders exist")
-    void testGetAllOrders_WhenNoOrders_ShouldReturnEmptyList() {
-        when(orderRepository.findAll()).thenReturn(List.of());
-
-        List<OrderDTO> result = orderService.getAllOrders();
-
-        assertThat(result).isNotNull();
-        assertThat(result).isEmpty();
-
-        verify(orderRepository, times(1)).findAll();
-        verify(dtoMapper, never()).mapToDTO(any(Order.class));
-    }
+    // CREATE TESTS
 
     @Test
     @DisplayName("Should return OrderDTO when order is successfully created")
@@ -161,4 +133,56 @@ public class OrderServiceTests {
         verify(orderStatusService, times(1)).getOrderStatusByName("Pending");
         verifyNoInteractions(orderRepository, dtoMapper);
     }
+
+    // GET TESTS
+
+    @Test
+    @DisplayName("Should return list of OrderDTO when orders exist")
+    void testGetAllOrders_ShouldReturnOrderDTOList() {
+        when(orderRepository.findAll()).thenReturn(Arrays.asList(order));
+        when(dtoMapper.mapToDTO(order)).thenReturn(orderDTO);
+
+        List<OrderDTO> result = orderService.getAllOrders();
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getUserId()).isEqualTo(1L);
+
+        verify(orderRepository, times(1)).findAll();
+        verify(dtoMapper, times(1)).mapToDTO(order);
+    }
+
+    @Test
+    @DisplayName("Should return empty list when no orders exist")
+    void testGetAllOrders_WhenNoOrders_ShouldReturnEmptyList() {
+        when(orderRepository.findAll()).thenReturn(List.of());
+
+        List<OrderDTO> result = orderService.getAllOrders();
+
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+
+        verify(orderRepository, times(1)).findAll();
+        verify(dtoMapper, never()).mapToDTO(any(Order.class));
+    }
+
+    @Test
+    @DisplayName("Should return Order when order ID exists")
+    void getOrderById_ShouldReturnOrder_WhenIdExists() {
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(order));
+        Order result = orderService.getOrderById(100L);
+        assertNotNull(result);
+        assertEquals(100L, result.getOrderId());
+        verify(orderRepository, times(1)).findById(100L);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when order ID does not exist")
+    void getOrderById_ShouldThrowException_WhenIdDoesNotExist() {
+        when(orderRepository.findById(100L)).thenReturn(Optional.empty());
+        assertThrows(Exception.class, () -> orderService.getOrderById(100L));
+        verify(orderRepository, times(1)).findById(100L);
+    }
+
+
 }
