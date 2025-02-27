@@ -182,7 +182,6 @@ public class AdministrationGUI {
 
     void getAllUsers() {
 
-        // Konfigurisanje ObjectMapper-a
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // support Java 8 date/time API
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Lijep format

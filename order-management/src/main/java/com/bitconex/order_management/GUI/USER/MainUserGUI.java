@@ -1,7 +1,15 @@
 package com.bitconex.order_management.GUI.USER;
 
+import com.bitconex.order_management.dto.OrderDTO;
+import com.bitconex.order_management.dto.UserDTO;
+import com.bitconex.order_management.service.OrderService;
+import com.bitconex.order_management.utils.SessionManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Scanner;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.print;
@@ -10,6 +18,13 @@ import static com.bitconex.order_management.utils.ConsoleUtil.printError;
 @Component
 public class MainUserGUI {
     private final Scanner scanner = new Scanner(System.in);
+    private final OrderService orderService;
+    private final SessionManager sessionManager;
+
+    public MainUserGUI(OrderService orderService, SessionManager sessionManager) {
+        this.orderService = orderService;
+        this.sessionManager = sessionManager;
+    }
 
     public void startUserConsole() {
         while (true) {
@@ -34,7 +49,8 @@ public class MainUserGUI {
             switch (choice) {
                 case 1:
                     try {
-                        print("List of all ORDERS");
+                        Long userId = sessionManager.getCurrentUserId();
+                        getAllOrders(userId);
                     } catch (Exception e) {
                         printError("Error listing orders - " + e.getMessage());
                     }
@@ -54,4 +70,19 @@ public class MainUserGUI {
             }
         }
     }
+
+    void getAllOrders(Long userId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Za podršku za LocalDate
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Lijep format
+
+        try {
+            List<OrderDTO> orders = orderService.getAllOrders();
+            String jsonOutput = objectMapper.writeValueAsString(orders);
+            print(jsonOutput);
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving orders: " + e.getMessage());
+        }
+    }
+
 }

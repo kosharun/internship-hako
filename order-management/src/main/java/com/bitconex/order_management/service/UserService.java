@@ -18,6 +18,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -133,17 +134,29 @@ public class UserService {
         printSuccess("Successfully removed user: " + username);
     }
 
-    public String login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User with that username does not exist!"));
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             String role = user.getRole().getName();
             printSuccess("Successfully logged in as " + username + " with a role: " + role);
-            return role;
+            return new LoginResponse(user.getUserId(), role);
         } else {
             throw new RuntimeException("Wrong password!");
         }
+    }
+
+    @Getter
+    public static class LoginResponse {
+        private final Long userId;
+        private final String role;
+
+        public LoginResponse(Long userId, String role) {
+            this.userId = userId;
+            this.role = role;
+        }
+
     }
 
 

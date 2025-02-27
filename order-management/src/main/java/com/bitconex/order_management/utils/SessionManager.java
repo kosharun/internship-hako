@@ -1,18 +1,15 @@
 package com.bitconex.order_management.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+@Getter
+@Setter
 @Component
 public class SessionManager {
     private String currentUserRole;
-
-    public String getCurrentUserRole() {
-        return currentUserRole;
-    }
-
-    public void setCurrentUserRole(String role) {
-        this.currentUserRole = role;
-    }
+    private Long currentUserId;
 
     public boolean isAdmin() {
         return "ADMIN".equalsIgnoreCase(currentUserRole);
