@@ -80,7 +80,7 @@ public class MainUserGUI {
             List<OrderDTO> orders = orderService.getAllOrders();
             String jsonOutput = objectMapper.writeValueAsString(orders);
             print(jsonOutput);
-        } catch (Exception e) { //tests
+        } catch (Exception e) {
             throw new RuntimeException("Error retrieving orders: " + e.getMessage());
         }
     }
