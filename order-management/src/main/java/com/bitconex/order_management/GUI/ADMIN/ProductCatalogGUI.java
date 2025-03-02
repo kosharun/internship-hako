@@ -120,7 +120,7 @@ public class ProductCatalogGUI {
         }
     }
 
-    void getAllProducts() {
+    public void getAllProducts() {
         List<Product> products = productService.getAllProducts();
         if (products.isEmpty()) {
             printInfo("No available products!");

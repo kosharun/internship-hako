@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @Data
 public class OrderDTO {
+    private Long orderId;
     private Long userId;
     private OrderStatus status;
     private List<OrderItem> orderItems;
