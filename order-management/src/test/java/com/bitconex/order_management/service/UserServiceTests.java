@@ -326,7 +326,7 @@ class UserServiceTests {
 
     //LOGIN USERS TESTS
     @Test
-    @DisplayName("Should log in a user / return role of user")
+    @DisplayName("Should log in a user")
     void testLogin_ShouldLoginUser() {
         User user = User.builder()
                 .username("runha")
@@ -337,7 +337,7 @@ class UserServiceTests {
         when(userRepository.findByUsername("runha")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("password123", "password123")).thenReturn(true);
 
-        assertThat(userService.login("runha", "password123")).isNotEmpty();
+        assertThat(userService.login("runha", "password123")).isNotNull();
     }
 
     @Test

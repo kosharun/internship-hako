@@ -44,6 +44,19 @@ public class OrderService {
         return orderDTOS;
     }
 
+    //get all orders by userid
+    public List<OrderDTO> getAllOrdersByUserId(Long userId) {
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        List<Order> orders = orderRepository.findAllByUser(user);
+
+        for (Order order : orders) {
+            orderDTOS.add(dtoMapper.mapToDTO(order));
+        }
+
+        return orderDTOS;
+    }
+
     public Order getOrderById(Long Id)  {
         return orderRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find order"));
     }

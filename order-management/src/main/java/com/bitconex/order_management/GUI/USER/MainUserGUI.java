@@ -77,7 +77,7 @@ public class MainUserGUI {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Lijep format
 
         try {
-            List<OrderDTO> orders = orderService.getAllOrders();
+            List<OrderDTO> orders = orderService.getAllOrdersByUserId(userId);
             String jsonOutput = objectMapper.writeValueAsString(orders);
             print(jsonOutput);
         } catch (Exception e) {
