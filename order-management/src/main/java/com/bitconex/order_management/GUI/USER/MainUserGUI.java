@@ -10,16 +10,16 @@ import com.bitconex.order_management.utils.SessionManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.freva.asciitable.AsciiTable;
+import com.github.freva.asciitable.Column;
+import com.github.freva.asciitable.HorizontalAlign;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-import static com.bitconex.order_management.utils.ConsoleUtil.print;
-import static com.bitconex.order_management.utils.ConsoleUtil.printError;
+import static com.bitconex.order_management.utils.ConsoleUtil.*;
 
 @Component
 public class MainUserGUI {
@@ -27,15 +27,12 @@ public class MainUserGUI {
     private final OrderService orderService;
     private final ProductService productService;
     private final SessionManager sessionManager;
-    private final ProductCatalogGUI productCatalogGUI;
     private final OrderItemService orderItemService;
 
-
-    public MainUserGUI(OrderService orderService, ProductService productService, SessionManager sessionManager, ProductCatalogGUI productCatalogGUI, OrderItemService orderItemService) {
+    public MainUserGUI(OrderService orderService, ProductService productService, SessionManager sessionManager, OrderItemService orderItemService) {
         this.orderService = orderService;
         this.productService = productService;
         this.sessionManager = sessionManager;
-        this.productCatalogGUI = productCatalogGUI;
         this.orderItemService = orderItemService;
     }
 
@@ -48,14 +45,13 @@ public class MainUserGUI {
                     print("1. List of my orders");
                     print("2. Order now");
                     print("3. Exit");
-
                     print("Select an option: ");
                     choice = scanner.nextInt();
-                    scanner.nextLine(); // Consume leftover newline
+                    scanner.nextLine();
                     break;
                 } catch (Exception e) {
                     printError("The input should be a number!");
-                    scanner.nextLine(); // Clear invalid input to avoid infinite loop
+                    scanner.nextLine();
                 }
             }
 
@@ -86,8 +82,8 @@ public class MainUserGUI {
 
     void getAllOrders(Long userId) {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // Za podršku za LocalDate
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Lijep format
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         try {
             List<OrderDTO> orders = orderService.getAllOrdersByUserId(userId);
@@ -98,11 +94,39 @@ public class MainUserGUI {
         }
     }
 
+    void getAllAvailableProducts() {
+        List<Product> products = productService.getAllAvailableProducts();
+        if (products.isEmpty()) {
+            printInfo("No available products!");
+            return;
+        }
+
+        String table = AsciiTable.getTable(products, Arrays.asList(
+                new Column().header("ID").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> String.valueOf(product.getProductId())),
+                new Column().header("Catalog").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.LEFT)
+                        .with(product -> product.getCatalog() != null ? product.getCatalog().getName() : "N/A"),
+                new Column().header("Name").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.LEFT)
+                        .with(Product::getName),
+                new Column().header("Description").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.LEFT)
+                        .with(product -> product.getDescription() != null ? product.getDescription() : "N/A"),
+                new Column().header("Price").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.RIGHT)
+                        .with(product -> String.format("%.2f", product.getPrice())),
+                new Column().header("Published").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> product.getDatePublished() != null ? product.getDatePublished().toString() : "N/A"),
+                new Column().header("Available Until").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> product.getAvailableUntil() != null ? product.getAvailableUntil().toString() : "Indefinite"),
+                new Column().header("Stock").headerAlign(HorizontalAlign.CENTER).dataAlign(HorizontalAlign.CENTER)
+                        .with(product -> String.valueOf(product.getStockQuantity()))
+        ));
+
+        print(table);
+    }
 
     void orderNow() {
         try {
             print("Available products: ");
-            productCatalogGUI.getAllProducts();
+            getAllAvailableProducts();
 
             List<ProductOrder> orderItems = new ArrayList<>();
             double totalPrice = 0.0;
@@ -111,32 +135,37 @@ public class MainUserGUI {
                 Long productId = null;
                 int quantity = 0;
 
-                // Get valid product ID
                 while (true) {
                     print("Enter the product ID (or type 'done' to finish): ");
                     if (scanner.hasNextLong()) {
                         productId = scanner.nextLong();
-                        scanner.nextLine(); // Consume newline
-                        break;
+                        scanner.nextLine();
+                        try {
+                            productService.getProductById(productId);
+                            break;
+                        } catch (RuntimeException e) {
+                            printError("Product with ID " + productId + " not found.");
+                        }
                     } else if (scanner.hasNext("done")) {
-                        scanner.nextLine(); // Consume "done" input
+                        scanner.nextLine();
                         break;
                     } else {
                         printError("Invalid input. Please enter a valid product ID (numeric value) or 'done' to finish.");
-                        scanner.nextLine(); // Clear invalid input
+                        scanner.nextLine();
                     }
                 }
 
                 if (productId == null) {
-                    break; // User finished adding items
+                    break;
                 }
 
-                // Get valid quantity
+                Product product = productService.getProductById(productId);
+
                 while (true) {
                     print("Enter the quantity for product ID " + productId + ": ");
                     if (scanner.hasNextInt()) {
                         quantity = scanner.nextInt();
-                        scanner.nextLine(); // Consume newline
+                        scanner.nextLine();
                         if (quantity > 0) {
                             break;
                         } else {
@@ -144,20 +173,36 @@ public class MainUserGUI {
                         }
                     } else {
                         printError("Invalid input. Please enter a valid quantity.");
-                        scanner.nextLine(); // Clear invalid input
+                        scanner.nextLine();
                     }
                 }
 
-                // Fetch product price (assuming a method exists)
-                Product product = productService.getProductById(productId);
+                Long finalProductId = productId;
+                ProductOrder existingProductOrder = orderItems.stream()
+                        .filter(item -> item.getProductId().equals(finalProductId))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingProductOrder != null) {
+                    int newQuantity = existingProductOrder.getQuantity() + quantity;
+                    if (newQuantity > product.getStockQuantity()) {
+                        printError("Not enough stock available! You already have " + existingProductOrder.getQuantity() + " in cart. Only " + product.getStockQuantity() + " left.");
+                        continue;
+                    }
+                    existingProductOrder.setQuantity(newQuantity);
+                    print("✅ Updated quantity of product ID " + productId + " to " + newQuantity);
+                } else {
+                    if (quantity > product.getStockQuantity()) {
+                        printError("Not enough stock available! Only " + product.getStockQuantity() + " left.");
+                        continue;
+                    }
+                    orderItems.add(new ProductOrder(productId, quantity));
+                    print("✅ Added product ID " + productId + " with quantity " + quantity);
+                }
+
                 double productPrice = product.getPrice();
-                double itemTotalPrice = productPrice * quantity;
-
-                // Add item to the list and update total price
-                orderItems.add(new ProductOrder(productId, quantity));
-                totalPrice += itemTotalPrice;
-
-                print("✅ Added product ID " + productId + " with quantity " + quantity + " (Subtotal: $" + itemTotalPrice + ")");
+                totalPrice += productPrice * quantity;
+                print("✅ Added product ID " + productId + " with quantity " + quantity + " (Subtotal: $" + totalPrice + ")");
             }
 
             if (orderItems.isEmpty()) {
@@ -165,28 +210,53 @@ public class MainUserGUI {
                 return;
             }
 
-            // Confirm order
-            print("Type 'finish' or 'cancel' to confirm or cancel the order: ");
+            print("\n🔹 Your Order Summary 🔹");
+
+            List<Map<String, String>> displayData = new ArrayList<>();
+            for (ProductOrder item : orderItems) {
+                Product product = productService.getProductById(item.getProductId());
+                Map<String, String> row = new HashMap<>();
+                row.put("Product ID", String.valueOf(item.getProductId()));
+                row.put("Product Name", product.getName());
+                row.put("Quantity", String.valueOf(item.getQuantity()));
+                row.put("Subtotal", String.format("$%.2f", product.getPrice() * item.getQuantity()));
+                displayData.add(row);
+            }
+
+            String table = AsciiTable.getTable(displayData, Arrays.asList(
+                    new Column().header("Product ID").headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.CENTER)
+                            .with(row -> row.get("Product ID")),
+                    new Column().header("Product Name").headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.LEFT)
+                            .with(row -> row.get("Product Name")),
+                    new Column().header("Quantity").headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.CENTER)
+                            .with(row -> row.get("Quantity")),
+                    new Column().header("Subtotal").headerAlign(HorizontalAlign.CENTER)
+                            .dataAlign(HorizontalAlign.RIGHT)
+                            .with(row -> row.get("Subtotal"))
+            ));
+
+            print(table);
+            print("💰 Total Price: $" + String.format("%.2f", totalPrice));
+            print("\nType 'finish' to confirm or 'cancel' to cancel the order: ");
             String finish = scanner.nextLine().trim().toLowerCase();
 
-            if (finish.equals("cancel")) {
-                print("Order cancelled.");
+            if ("cancel".equals(finish)) {
+                print("❌ Order cancelled.");
                 return;
-            } else if (!finish.equals("finish")) {
+            } else if (!"finish".equals(finish)) {
                 printError("Invalid input. Order cancelled.");
                 return;
             }
 
-            // Create order request DTO
+            print("✅ Order confirmed! Processing your order...");
             Long userId = sessionManager.getCurrentUserId();
             OrderRequestDTO orderRequest = new OrderRequestDTO(userId, totalPrice);
-
-            // Create order and get order ID
             OrderDTO newOrder = orderService.createOrder(orderRequest);
-
             Long orderId = newOrder.getOrderId();
 
-            // Create order items using the generated order ID
             List<OrderItemRequestDTO> finalOrderItems = new ArrayList<>();
             for (ProductOrder item : orderItems) {
                 finalOrderItems.add(OrderItemRequestDTO.builder()
@@ -196,31 +266,24 @@ public class MainUserGUI {
                         .build());
             }
 
-            // Save order items by looping through the list
-
             for (OrderItemRequestDTO orderItem : finalOrderItems) {
                 orderItemService.createOrderItem(orderItem);
+                productService.reduceStock(orderItem.getProductId(), orderItem.getQuantity());
             }
 
             print("✅ Order placed successfully!");
             print("Order ID: " + orderId);
             print("Total Price: $" + totalPrice);
-
         } catch (Exception e) {
             printError("Error processing order - " + e.getMessage());
         }
     }
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    static
-    class ProductOrder {
+    static class ProductOrder {
         private Long productId;
         private int quantity;
     }
-
-
-
 }

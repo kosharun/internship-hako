@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,8 +75,29 @@ public class ProductService {
         return products;
     }
 
+    public void checkProductAvailability() {
+        List<Product> products = productRepository.findAll();
+        for(Product product : products) {
+            if(product.getAvailableUntil().isBefore(LocalDate.now())) {
+                product.setAvailable(false);
+                productRepository.save(product);
+            }
+        }
+    }
+
+    public List<Product> getAllAvailableProducts() {
+        checkProductAvailability();
+        List<Product> products = productRepository.findAllByAvailableTrue();
+        if(products.isEmpty()) {
+            throw new RuntimeException("No available products found!");
+        }
+
+        return products;
+    }
+
     public Product getProductById(Long Id)  {
-        return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find product"));
+        print("Fetching product with ID: " + Id);
+        return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find productaa" + Id));
     }
 
     @Transactional
@@ -98,6 +120,15 @@ public class ProductService {
         }
 
         return orderItems.stream().map(dtoMapper::mapToDTO).toList();
+    }
+
+    public void reduceStock (Long productId, int quantity) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        if (product.getStockQuantity() < quantity) {
+            throw new RuntimeException("Not enough stock for product: " + product.getName());
+        }
+        product.setStockQuantity(product.getStockQuantity() - quantity);
+        productRepository.save(product);
     }
 
 

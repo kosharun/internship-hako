@@ -24,5 +24,7 @@ public class Product {
     private double price;
     private LocalDate datePublished = LocalDate.now();
     private LocalDate availableUntil;
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean available = true;
     private int stockQuantity;
 }
