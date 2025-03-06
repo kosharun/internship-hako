@@ -1,5 +1,7 @@
 package com.bitconex.order_management.GUI.ADMIN;
 
+import com.bitconex.order_management.GUI.MainMenu;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
@@ -12,10 +14,12 @@ public class MainAdminGUI {
     private final Scanner scanner = new Scanner(System.in);
     private final AdministrationGUI administrationGUI;
     private final ProductCatalogGUI productCatalogGUI;
+    private final MainMenu mainMenu;
 
-    public MainAdminGUI(AdministrationGUI administrationGUI, ProductCatalogGUI productCatalogGUI) {
+    public MainAdminGUI(AdministrationGUI administrationGUI, ProductCatalogGUI productCatalogGUI, @Lazy MainMenu mainMenu) {
         this.administrationGUI = administrationGUI;
         this.productCatalogGUI = productCatalogGUI;
+        this.mainMenu = mainMenu;
     }
 
 
@@ -62,6 +66,7 @@ public class MainAdminGUI {
                     break;
                 case 4:
                     print("Exiting Admin Panel...");
+                    mainMenu.start();
                     return;
                 default:
                     printError("Invalid choice. Try again.");

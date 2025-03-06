@@ -27,9 +27,11 @@ public class MainMenu {
     }
 
     public void start() {
-        print("Welcome to Order Management System!");
+        print("Welcome to Order Management System! Please Sign In.");
         String role = "";
         Long userId = null;
+        sessionManager.setCurrentUserId(userId);
+        sessionManager.setCurrentUserRole(role);
         while (role.isEmpty()) {
             try {
                 print("Enter Username: ");

@@ -147,6 +147,7 @@ public class UserService {
         }
     }
 
+
     @Getter
     public static class LoginResponse {
         private final Long userId;
