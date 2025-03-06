@@ -95,9 +95,14 @@ public class ProductService {
         return products;
     }
 
+    public void setProductAvailability(Long productId, boolean available) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setAvailable(available);
+        productRepository.save(product);
+    }
+
     public Product getProductById(Long Id)  {
-        print("Fetching product with ID: " + Id);
-        return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find productaa" + Id));
+        return productRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find product"));
     }
 
     @Transactional
@@ -122,13 +127,17 @@ public class ProductService {
         return orderItems.stream().map(dtoMapper::mapToDTO).toList();
     }
 
-    public void reduceStock (Long productId, int quantity) {
+    public int reduceStock (Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         if (product.getStockQuantity() < quantity) {
             throw new RuntimeException("Not enough stock for product: " + product.getName());
         }
-        product.setStockQuantity(product.getStockQuantity() - quantity);
+
+        int quantityLeft = product.getStockQuantity() - quantity;
+
+        product.setStockQuantity(quantityLeft);
         productRepository.save(product);
+        return quantityLeft;
     }
 
 

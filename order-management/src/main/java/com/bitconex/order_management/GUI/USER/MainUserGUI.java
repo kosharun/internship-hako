@@ -222,9 +222,16 @@ public class MainUserGUI {
                     .build());
         }
 
+        int quantityLeft;
+        boolean isAvailable;
+
         for (OrderItemRequestDTO orderItem : finalOrderItems) {
             orderItemService.createOrderItem(orderItem);
-            productService.reduceStock(orderItem.getProductId(), orderItem.getQuantity());
+            quantityLeft = productService.reduceStock(orderItem.getProductId(), orderItem.getQuantity());
+
+            isAvailable = quantityLeft > 0;
+
+            productService.setProductAvailability(orderItem.getProductId(), isAvailable);
         }
 
         print("✅ Order placed successfully!");
