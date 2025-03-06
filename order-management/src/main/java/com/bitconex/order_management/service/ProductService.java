@@ -36,14 +36,12 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CatalogRepository catalogRepository;
     private final OrderItemRepository orderItemRepository;
-    private final OrderItemService orderItemService;
     private final DTOMapper dtoMapper;
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, @Lazy OrderItemService orderItemService, DTOMapper dtoMapper) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, DTOMapper dtoMapper) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
         this.orderItemRepository = orderItemRepository;
-        this.orderItemService = orderItemService;
         this.dtoMapper = dtoMapper;
     }
 
@@ -138,6 +136,12 @@ public class ProductService {
         product.setStockQuantity(quantityLeft);
         productRepository.save(product);
         return quantityLeft;
+    }
+
+    public void updateProductQuantity(Long productId, int quantity) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setStockQuantity(quantity);
+        productRepository.save(product);
     }
 
 

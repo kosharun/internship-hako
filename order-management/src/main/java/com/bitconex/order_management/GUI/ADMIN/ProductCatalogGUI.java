@@ -35,8 +35,9 @@ public class ProductCatalogGUI {
                     print("\n🔹 PRODUCT CATALOG 🔹");
                     print("1. Create New Product");
                     print("2. View All Products");
-                    print("3. Remove A Product");
-                    print("4. Exit");
+                    print("3. Update Product Quantity");
+                    print("4. Remove A Product");
+                    print("5. Exit");
 
                     print("Select an option: ");
                     choice = scanner.nextInt();
@@ -65,12 +66,19 @@ public class ProductCatalogGUI {
                     break;
                 case 3:
                     try {
+                        updateQuantity();
+                    } catch (Exception e) {
+                        printError("Error updating quantity - " + e.getMessage());
+                    }
+                    break;
+                case 4:
+                    try {
                         removeProduct();
                     } catch (Exception e) {
                         printError("Error removing product - " + e.getMessage());
                     }
                     break;
-                case 4:
+                case 5:
                     print("Exiting Product Catalog...");
                     return;
                 default:
@@ -216,6 +224,21 @@ public class ProductCatalogGUI {
 
         productService.removeProduct(Id);
         printSuccess("Product removed successfully.");
+    }
+
+    void updateQuantity() {
+        getAllProducts();
+
+        print("Type in the ID of the product you want to update: ");
+        Long Id = scanner.nextLong();
+        scanner.nextLine();
+
+        print("Enter the new stock quantity: ");
+        int stockQuantity = scanner.nextInt();
+        scanner.nextLine();
+
+        productService.updateProductQuantity(Id, stockQuantity);
+        printSuccess("Product quantity updated successfully.");
     }
 
 
