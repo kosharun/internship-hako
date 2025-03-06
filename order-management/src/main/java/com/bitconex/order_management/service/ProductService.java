@@ -141,6 +141,9 @@ public class ProductService {
     public void updateProductQuantity(Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         product.setStockQuantity(quantity);
+        if(!product.isAvailable() && quantity > 0) {
+            product.setAvailable(true);
+        }
         productRepository.save(product);
     }
 
