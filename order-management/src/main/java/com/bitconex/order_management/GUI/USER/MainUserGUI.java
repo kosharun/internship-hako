@@ -3,6 +3,7 @@ package com.bitconex.order_management.GUI.USER;
 import com.bitconex.order_management.GUI.ADMIN.ProductCatalogGUI;
 import com.bitconex.order_management.GUI.MainMenu;
 import com.bitconex.order_management.dto.*;
+import com.bitconex.order_management.entity.Order;
 import com.bitconex.order_management.entity.Product;
 import com.bitconex.order_management.service.OrderItemService;
 import com.bitconex.order_management.service.OrderService;
@@ -48,7 +49,8 @@ public class MainUserGUI {
                     print("\n🔹 USER PANEL 🔹");
                     print("1. List of my orders");
                     print("2. Order now");
-                    print("3. Exit");
+                    print("3. Cancel an order");
+                    print("4. Exit");
                     print("Select an option: ");
                     choice = scanner.nextInt();
                     scanner.nextLine();
@@ -76,12 +78,49 @@ public class MainUserGUI {
                     }
                     break;
                 case 3:
+                    cancelOrder();
+                    break;
+                case 4:
                     print("Exiting...");
                     mainMenu.start();
                     return;
                 default:
                     printError("Invalid option!");
             }
+        }
+    }
+
+    void cancelOrder() {
+        print("Enter the order ID of the order you want to cancel: ");
+        Long orderId = scanner.nextLong();
+        scanner.nextLine();
+
+        try {
+            Order order = orderService.getOrderById(orderId);
+            if (order == null) {
+                printError("Order with ID " + orderId + " not found.");
+                return;
+            }
+
+            if (!order.getUser().getUserId().equals(sessionManager.getCurrentUserId())) {
+                printError("You are not authorized to cancel this order.");
+                return;
+            }
+
+            if (order.getStatus().getName().equalsIgnoreCase("cancelled")) {
+                printError("Order with ID " + orderId + " is already cancelled.");
+                return;
+            }
+
+            if (order.getStatus().getName().equalsIgnoreCase("completed")) {
+                printError("Order with ID " + orderId + " is already delivered. Cannot cancel.");
+                return;
+            }
+
+            orderService.cancelOrder(orderId);
+            print("Order with ID " + orderId + " cancelled successfully.");
+        } catch (Exception e) {
+            printError("Error cancelling order - " + e.getMessage());
         }
     }
 

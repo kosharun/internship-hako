@@ -92,4 +92,14 @@ public class OrderService {
         printSuccess("Successfully updated order status to: " + status);
     }
 
+
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        OrderStatus orderStatus = orderStatusService.getOrderStatusByNameIgnoreCase("Cancelled")
+                .orElseThrow(() -> new RuntimeException("Status not found: Cancelled"));
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+        printSuccess("Successfully cancelled order with ID: " + orderId);
+    }
+
 }
