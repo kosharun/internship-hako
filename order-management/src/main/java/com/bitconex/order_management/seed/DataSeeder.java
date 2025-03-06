@@ -219,7 +219,7 @@ public class DataSeeder implements CommandLineRunner {
 
         orderStatuses.forEach(statusNode -> {
             String statusName = statusNode.get("name").asText();
-            if (orderStatusRepository.findByName(statusName).isEmpty()) {
+            if (orderStatusRepository.findByNameIgnoreCase(statusName).isEmpty()) {
                 OrderStatus status = new OrderStatus();
                 status.setName(statusName);
                 orderStatusRepository.save(status);
@@ -248,7 +248,7 @@ public class DataSeeder implements CommandLineRunner {
             }
 
             // Find the order status
-            Optional<OrderStatus> status = orderStatusRepository.findByName(statusName);
+            Optional<OrderStatus> status = orderStatusRepository.findByNameIgnoreCase(statusName);
             if (status.isEmpty()) {
                 System.out.println("⚠️ Order status not found: " + statusName);
                 return;

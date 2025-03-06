@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bitconex.order_management.utils.ConsoleUtil.printSuccess;
+
 @Service
 public class OrderService {
 
@@ -71,7 +73,7 @@ public class OrderService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Optional<OrderStatus> status = orderStatusService.getOrderStatusByName("Pending");
+        Optional<OrderStatus> status = orderStatusService.getOrderStatusByNameIgnoreCase("Pending");
 
         Order order = Order.builder()
                 .user(user)
@@ -80,6 +82,14 @@ public class OrderService {
                 .createdAt(createdAt)
                 .build();
         return dtoMapper.mapToDTO(orderRepository.save(order));
+    }
+
+    public void updateOrderStatus(Order order, String status) {
+        OrderStatus orderStatus = orderStatusService.getOrderStatusByNameIgnoreCase(status)
+                .orElseThrow(() -> new RuntimeException("Status not found: " + status));
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+        printSuccess("Successfully updated order status to: " + status);
     }
 
 }

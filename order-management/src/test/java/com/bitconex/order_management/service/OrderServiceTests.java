@@ -80,7 +80,7 @@ public class OrderServiceTests {
     @DisplayName("Should return OrderDTO when order is successfully created")
     void createOrder_ShouldReturnOrderDTO_WhenValidRequest() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(orderStatusService.getOrderStatusByName("Pending")).thenReturn(Optional.of(orderStatus));
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Pending")).thenReturn(Optional.of(orderStatus));
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(dtoMapper.mapToDTO(order)).thenReturn(orderDTO);
 
@@ -90,7 +90,7 @@ public class OrderServiceTests {
         assertEquals(1L, result.getUserId());
 
         verify(userRepository, times(1)).findById(1L);
-        verify(orderStatusService, times(1)).getOrderStatusByName("Pending");
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Pending");
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(dtoMapper, times(1)).mapToDTO(order);
     }
@@ -123,14 +123,14 @@ public class OrderServiceTests {
     @DisplayName("Should throw exception when order status is not found")
     void createOrder_ShouldThrowException_WhenOrderStatusNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(orderStatusService.getOrderStatusByName("Pending")).thenReturn(Optional.empty());
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Pending")).thenReturn(Optional.empty());
 
         assertThrows(Exception.class, () -> {
             orderService.createOrder(orderRequestDTO);
         });
 
         verify(userRepository, times(1)).findById(1L);
-        verify(orderStatusService, times(1)).getOrderStatusByName("Pending");
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Pending");
         verifyNoInteractions(orderRepository, dtoMapper);
     }
 

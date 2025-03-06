@@ -15,11 +15,13 @@ public class MainAdminGUI {
     private final AdministrationGUI administrationGUI;
     private final ProductCatalogGUI productCatalogGUI;
     private final MainMenu mainMenu;
+    private final OrderAdministrationGUI orderAdministrationGUI;
 
-    public MainAdminGUI(AdministrationGUI administrationGUI, ProductCatalogGUI productCatalogGUI, @Lazy MainMenu mainMenu) {
+    public MainAdminGUI(AdministrationGUI administrationGUI, ProductCatalogGUI productCatalogGUI, @Lazy MainMenu mainMenu, OrderAdministrationGUI orderAdministrationGUI) {
         this.administrationGUI = administrationGUI;
         this.productCatalogGUI = productCatalogGUI;
         this.mainMenu = mainMenu;
+        this.orderAdministrationGUI = orderAdministrationGUI;
     }
 
 
@@ -32,8 +34,9 @@ public class MainAdminGUI {
                     print("\n🔹 ADMIN PANEL 🔹");
                     print("1. User Administration");
                     print("2. Product Catalog");
-                    print("3. Export list of all orders in CSV");
-                    print("4. Exit");
+                    print("3. Order Administration");
+                    print("4. Export list of all orders in CSV");
+                    print("5. Exit");
 
                     print("Select an option: ");
                     choice = scanner.nextInt();
@@ -62,9 +65,12 @@ public class MainAdminGUI {
                     }
                     break;
                 case 3:
-
+                    orderAdministrationGUI.startOrderAdminConsole();
                     break;
                 case 4:
+
+                    break;
+                case 5:
                     print("Exiting Admin Panel...");
                     mainMenu.start();
                     return;

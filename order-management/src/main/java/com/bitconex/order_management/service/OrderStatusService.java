@@ -14,7 +14,7 @@ public class OrderStatusService {
         this.orderStatusRepository = orderStatusRepository;
     }
 
-    public Optional<OrderStatus> getOrderStatusByName(String name) {
-        return orderStatusRepository.findByName(name);
+    public Optional<OrderStatus> getOrderStatusByNameIgnoreCase(String name) {
+        return orderStatusRepository.findByNameIgnoreCase(name);
     }
 }
