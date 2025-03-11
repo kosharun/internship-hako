@@ -67,14 +67,11 @@ public class OrderServiceTests {
         orderDTO.setTotalPrice(50.0);
         orderDTO.setCreatedAt(order.getCreatedAt());
 
-        orderRequestDTO = OrderRequestDTO
-                .builder()
+        orderRequestDTO = OrderRequestDTO.builder()
                 .userId(1L)
                 .totalPrice(50.0)
                 .build();
     }
-
-    // CREATE TESTS
 
     @Test
     @DisplayName("Should return OrderDTO when order is successfully created")
@@ -88,7 +85,6 @@ public class OrderServiceTests {
 
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
-
         verify(userRepository, times(1)).findById(1L);
         verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Pending");
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -99,11 +95,7 @@ public class OrderServiceTests {
     @DisplayName("Should throw exception when userId is null")
     void createOrder_ShouldThrowException_WhenUserIdIsNull() {
         orderRequestDTO.setUserId(null);
-
-        assertThrows(Exception.class, () -> {
-            orderService.createOrder(orderRequestDTO);
-        });
-
+        assertThrows(Exception.class, () -> orderService.createOrder(orderRequestDTO));
         verifyNoInteractions(userRepository, orderStatusService, orderRepository, dtoMapper);
     }
 
@@ -111,10 +103,7 @@ public class OrderServiceTests {
     @DisplayName("Should throw exception when user is not found")
     void createOrder_ShouldThrowException_WhenUserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(Exception.class, () -> {
-            orderService.createOrder(orderRequestDTO);
-        });
-
+        assertThrows(Exception.class, () -> orderService.createOrder(orderRequestDTO));
         verify(userRepository, times(1)).findById(1L);
         verifyNoInteractions(orderStatusService, orderRepository, dtoMapper);
     }
@@ -124,30 +113,21 @@ public class OrderServiceTests {
     void createOrder_ShouldThrowException_WhenOrderStatusNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(orderStatusService.getOrderStatusByNameIgnoreCase("Pending")).thenReturn(Optional.empty());
-
-        assertThrows(Exception.class, () -> {
-            orderService.createOrder(orderRequestDTO);
-        });
-
+        assertThrows(Exception.class, () -> orderService.createOrder(orderRequestDTO));
         verify(userRepository, times(1)).findById(1L);
         verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Pending");
         verifyNoInteractions(orderRepository, dtoMapper);
     }
-
-    // GET TESTS
 
     @Test
     @DisplayName("Should return list of OrderDTO when orders exist")
     void testGetAllOrders_ShouldReturnOrderDTOList() {
         when(orderRepository.findAll()).thenReturn(Arrays.asList(order));
         when(dtoMapper.mapToDTO(order)).thenReturn(orderDTO);
-
         List<OrderDTO> result = orderService.getAllOrders();
-
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUserId()).isEqualTo(1L);
-
         verify(orderRepository, times(1)).findAll();
         verify(dtoMapper, times(1)).mapToDTO(order);
     }
@@ -156,12 +136,9 @@ public class OrderServiceTests {
     @DisplayName("Should return empty list when no orders exist")
     void testGetAllOrders_WhenNoOrders_ShouldReturnEmptyList() {
         when(orderRepository.findAll()).thenReturn(List.of());
-
         List<OrderDTO> result = orderService.getAllOrders();
-
         assertThat(result).isNotNull();
         assertThat(result).isEmpty();
-
         verify(orderRepository, times(1)).findAll();
         verify(dtoMapper, never()).mapToDTO(any(Order.class));
     }
@@ -184,5 +161,79 @@ public class OrderServiceTests {
         verify(orderRepository, times(1)).findById(100L);
     }
 
+    @Test
+    @DisplayName("Should return list of OrderDTO when orders exist for a given user")
+    void getAllOrdersByUserId_ShouldReturnOrderDTOList() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(orderRepository.findAllByUser(user)).thenReturn(Arrays.asList(order));
+        when(dtoMapper.mapToDTO(order)).thenReturn(orderDTO);
+        List<OrderDTO> result = orderService.getAllOrdersByUserId(1L);
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(1);
+        verify(userRepository, times(1)).findById(1L);
+        verify(orderRepository, times(1)).findAllByUser(user);
+        verify(dtoMapper, times(1)).mapToDTO(order);
+    }
 
+    @Test
+    @DisplayName("Should throw exception when user not found in getAllOrdersByUserId")
+    void getAllOrdersByUserId_ShouldThrowException_WhenUserNotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> orderService.getAllOrdersByUserId(1L));
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("Should update order status successfully")
+    void updateOrderStatus_ShouldUpdateStatus() {
+        OrderStatus newStatus = new OrderStatus();
+        newStatus.setName("Shipped");
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Shipped")).thenReturn(Optional.of(newStatus));
+        orderService.updateOrderStatus(order, "Shipped");
+        assertEquals("Shipped", order.getStatus().getName());
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Shipped");
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when new order status not found in updateOrderStatus")
+    void updateOrderStatus_ShouldThrowException_WhenStatusNotFound() {
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Shipped")).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> orderService.updateOrderStatus(order, "Shipped"));
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Shipped");
+        verify(orderRepository, never()).save(order);
+    }
+
+    @Test
+    @DisplayName("Should cancel order successfully")
+    void cancelOrder_ShouldCancelOrder() {
+        OrderStatus cancelledStatus = new OrderStatus();
+        cancelledStatus.setName("Cancelled");
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(order));
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Cancelled")).thenReturn(Optional.of(cancelledStatus));
+        orderService.cancelOrder(100L);
+        assertEquals("Cancelled", order.getStatus().getName());
+        verify(orderRepository, times(1)).findById(100L);
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Cancelled");
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when order not found in cancelOrder")
+    void cancelOrder_ShouldThrowException_WhenOrderNotFound() {
+        when(orderRepository.findById(100L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> orderService.cancelOrder(100L));
+        verify(orderRepository, times(1)).findById(100L);
+        verify(orderStatusService, never()).getOrderStatusByNameIgnoreCase("Cancelled");
+    }
+
+    @Test
+    @DisplayName("Should throw exception when cancel status not found in cancelOrder")
+    void cancelOrder_ShouldThrowException_WhenCancelStatusNotFound() {
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(order));
+        when(orderStatusService.getOrderStatusByNameIgnoreCase("Cancelled")).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> orderService.cancelOrder(100L));
+        verify(orderRepository, times(1)).findById(100L);
+        verify(orderStatusService, times(1)).getOrderStatusByNameIgnoreCase("Cancelled");
+    }
 }

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +29,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTests {
+
     @Mock
     private ProductRepository productRepository;
 
@@ -184,7 +184,6 @@ public class ProductServiceTests {
         assertThrows(Exception.class, () -> productService.removeProduct(product.getProductId()));
     }
 
-
     // FIND TESTS
 
     @Test
@@ -225,4 +224,131 @@ public class ProductServiceTests {
         verify(productRepository, times(1)).findById(product.getProductId());
         verify(orderItemRepository, times(1)).findAllByProduct(product);
     }
+
+
+    @Test
+    @DisplayName("Should retrieve all available products")
+    void testGetAllAvailableProducts_ShouldReturnAvailableProducts() {
+        // Arrange: create a product that is available (its availableUntil is in the future)
+        Product availableProduct = Product.builder()
+                .catalog(catalog)
+                .name("Available Product")
+                .description("Test available product")
+                .price(49.99)
+                .datePublished(LocalDate.of(2023, 1, 1))
+                .availableUntil(LocalDate.now().plusDays(10))
+                .stockQuantity(20)
+                .build();
+        availableProduct.setAvailable(true);
+
+        // checkProductAvailability() is called internally so simulate the outcome:
+        when(productRepository.findAll()).thenReturn(List.of(availableProduct));
+        when(productRepository.findAllByAvailableTrue()).thenReturn(List.of(availableProduct));
+
+        // Act:
+        List<Product> result = productService.getAllAvailableProducts();
+
+        // Assert:
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getName()).isEqualTo("Available Product");
+    }
+
+    @Test
+    @DisplayName("Should throw exception when no available products are found")
+    void testGetAllAvailableProducts_ShouldThrowException_WhenNoAvailableProducts() {
+        // Arrange: simulate empty list for available products
+        when(productRepository.findAll()).thenReturn(List.of());
+        when(productRepository.findAllByAvailableTrue()).thenReturn(List.of());
+
+        // Act & Assert:
+        assertThrows(RuntimeException.class, () -> productService.getAllAvailableProducts());
+    }
+
+
+    @Test
+    @DisplayName("Should set product availability")
+    void testSetProductAvailability_ShouldSetAvailability() {
+        // Arrange:
+        product.setAvailable(false);
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        // Act: set availability to true
+        productService.setProductAvailability(product.getProductId(), true);
+
+        // Assert:
+        verify(productRepository, times(1)).save(product);
+        assertThat(product.isAvailable()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should throw exception when setting availability for non-existing product")
+    void testSetProductAvailability_ShouldThrowException_WhenProductNotFound() {
+        // Arrange:
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.empty());
+
+        // Act & Assert:
+        assertThrows(RuntimeException.class, () -> productService.setProductAvailability(product.getProductId(), true));
+    }
+
+
+    @Test
+    @DisplayName("Should reduce stock when sufficient quantity is available")
+    void testReduceStock_ShouldReduceQuantity() {
+        // Arrange:
+        product.setStockQuantity(50);
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        // Act:
+        int remaining = productService.reduceStock(product.getProductId(), 20);
+
+        // Assert:
+        assertThat(remaining).isEqualTo(30);
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when reducing stock beyond available quantity")
+    void testReduceStock_ShouldThrowException_WhenInsufficientStock() {
+        // Arrange:
+        product.setStockQuantity(10);
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        // Act & Assert:
+        assertThrows(RuntimeException.class, () -> productService.reduceStock(product.getProductId(), 20));
+    }
+
+    @Test
+    @DisplayName("Should update product quantity and set available to true if quantity > 0 and product not available")
+    void testUpdateProductQuantity_ShouldUpdateQuantityAndSetAvailable() {
+        // Arrange: product not available and quantity is zero
+        product.setAvailable(false);
+        product.setStockQuantity(0);
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        // Act:
+        productService.updateProductQuantity(product.getProductId(), 30);
+
+        // Assert:
+        assertThat(product.getStockQuantity()).isEqualTo(30);
+        assertThat(product.isAvailable()).isTrue();
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    @DisplayName("Should update product quantity without changing availability if already available")
+    void testUpdateProductQuantity_ShouldUpdateQuantityWithoutChangingAvailability() {
+        // Arrange: product already available
+        product.setAvailable(true);
+        product.setStockQuantity(50);
+        when(productRepository.findById(product.getProductId())).thenReturn(Optional.of(product));
+
+        // Act:
+        productService.updateProductQuantity(product.getProductId(), 40);
+
+        // Assert:
+        assertThat(product.getStockQuantity()).isEqualTo(40);
+        assertThat(product.isAvailable()).isTrue();
+        verify(productRepository, times(1)).save(product);
+    }
+
 }
