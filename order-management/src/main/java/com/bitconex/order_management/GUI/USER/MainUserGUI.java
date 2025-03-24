@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.*;
@@ -295,6 +297,7 @@ public class MainUserGUI {
                 }
 
                 Product product = productService.getProductById(productId);
+                String productName = product.getName();
 
                 int quantity = inputQuantity(productId);
 
@@ -310,20 +313,21 @@ public class MainUserGUI {
                         continue;
                     }
                     existingProductOrder.setQuantity(newQuantity);
-                    print("✅ Updated quantity of product ID " + productId + " to " + newQuantity);
+                    print("✅ Updated quantity of product " + productName + " to " + newQuantity);
                 } else {
                     if (quantity > product.getStockQuantity()) {
                         printError("Not enough stock available! Only " + product.getStockQuantity() + " left.");
                         continue;
                     }
                     orderItems.add(new ProductOrder(productId, quantity));
-                    print("✅ Added product ID " + productId + " with quantity " + quantity);
                 }
 
 
                 double productPrice = product.getPrice();
                 totalPrice += productPrice * quantity;
-                print("✅ Added product ID " + productId + " with quantity " + quantity + " (Subtotal: $" + totalPrice + ")");
+                BigDecimal formattedPrice = BigDecimal.valueOf(totalPrice).setScale(2, RoundingMode.HALF_UP);
+                totalPrice = formattedPrice.doubleValue();
+                print("✅ Added product " + productName + " with quantity " + quantity + " (Subtotal: $" + totalPrice + ")");
             }
 
             if (orderItems.isEmpty()) {

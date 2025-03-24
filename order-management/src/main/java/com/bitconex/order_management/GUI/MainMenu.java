@@ -41,7 +41,6 @@ public class MainMenu {
                 print("Enter Password: ");
                 String password = scanner.nextLine();
 
-                // Simulate role checking (Replace with real authentication logic)
                 user = userService.login(username, password);
                 role = user.getRole();
                 userId = user.getUserId();
