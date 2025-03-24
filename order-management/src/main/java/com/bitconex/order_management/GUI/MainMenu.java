@@ -30,6 +30,7 @@ public class MainMenu {
         print("Welcome to Order Management System! Please Sign In.");
         String role = "";
         Long userId = null;
+        UserService.LoginResponse user = null;
         sessionManager.setCurrentUserId(userId);
         sessionManager.setCurrentUserRole(role);
         while (role.isEmpty()) {
@@ -41,8 +42,9 @@ public class MainMenu {
                 String password = scanner.nextLine();
 
                 // Simulate role checking (Replace with real authentication logic)
-                role = userService.login(username, password).getRole();
-                userId = userService.login(username, password).getUserId();
+                user = userService.login(username, password);
+                role = user.getRole();
+                userId = user.getUserId();
             } catch (Exception e) {
                 printError("Error logging in: " + e.getMessage());
             }
