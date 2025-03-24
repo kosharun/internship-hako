@@ -8,6 +8,9 @@ import com.bitconex.order_management.entity.Order;
 import com.bitconex.order_management.repository.OrderRepository;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import static com.bitconex.order_management.utils.ConsoleUtil.print;
@@ -32,7 +35,8 @@ public class OrderAdministrationGUI {
                     print("\n🔹 ORDER ADMINISTRATION 🔹");
                     print("1. View All Orders");
                     print("2. Update Order Status");
-                    print("3. Exit");
+                    print("3. Export list of all orders in CSV");
+                    print("4. Exit");
 
                     print("Select an option: ");
                     choice = scanner.nextInt();
@@ -60,19 +64,74 @@ public class OrderAdministrationGUI {
                     }
                     break;
                 case 3:
+                    try {
+                        exportAllOrdersInCSV();
+                    } catch (Exception e) {
+                        printError("Error exporting orders - " + e.getMessage());
+                    }
+                    break;
+                case 4:
                     print("Exiting...");
                     return;
+
                 default:
                     printError("Invalid choice. Try again.");
             }
         }
     }
 
+    public void exportAllOrdersInCSV() {
+        List<Order> orders = orderRepository.findAll();
+
+        if (orders.isEmpty()) {
+            printError("No orders to export!");
+            return;
+        }
+
+        String folderName = "orderCSVs";
+        File folder = new File(folderName);
+
+        if (!folder.exists() && !folder.mkdirs()) {
+            printError("Failed to create directory: " + folderName);
+            return;
+        }
+
+
+        String fileName = folderName + "/orders_export_" +
+                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(java.time.LocalDateTime.now()) + ".csv";
+
+        try (PrintWriter writer = new PrintWriter(fileName)) {
+
+            // CSV Headers
+            writer.println("Order ID,User ID,Total Price,Status,Order Date");
+
+            // CSV Data Rows
+            for (Order order : orders) {
+                String csvRow = String.format("%d,%d,%.2f,%s,%s",
+                        order.getOrderId(),
+                        order.getUser().getUserId(),
+                        order.getTotalPrice(),
+                        order.getStatus().getName(),
+                        order.getCreatedAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+                writer.println(csvRow);
+            }
+
+            print("✅ Orders successfully exported to " + fileName);
+
+        } catch (FileNotFoundException e) {
+            printError("Error creating file: " + e.getMessage());
+        } catch (Exception e) {
+            printError("Unexpected error during export: " + e.getMessage());
+        }
+    }
+
+
     private void viewAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
         if (orders.isEmpty()) {
-            print("❌ No orders found!");
+            printError("No orders found!");
             return;
         }
 
@@ -105,6 +164,7 @@ public class OrderAdministrationGUI {
     }
 
     private void updateOrderStatus() {
+        viewAllOrders();
         print("Enter Order ID: ");
         Long orderId = scanner.nextLong();
         scanner.nextLine();

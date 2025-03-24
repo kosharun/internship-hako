@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.bitconex.order_management.utils.ConsoleUtil.*;
@@ -93,6 +94,7 @@ public class MainUserGUI {
     }
 
     void cancelOrder() {
+        printAllOrders(sessionManager.getCurrentUserId());
         print("Enter the order ID of the order you want to cancel: ");
         Long orderId = scanner.nextLong();
         scanner.nextLine();
@@ -246,6 +248,39 @@ public class MainUserGUI {
         print(table);
         print("💰 Total Price: $" + String.format("%.2f", totalPrice));
     }
+
+    void printAllOrders(Long userId) {
+        List<OrderDTO> orders = orderService.getAllOrdersByUserId(userId);
+
+        if (orders.isEmpty()) {
+            printInfo("No orders found.");
+            return;
+        }
+
+        List<Map<String, String>> displayData = new ArrayList<>();
+        for (OrderDTO order : orders) {
+            Map<String, String> row = new HashMap<>();
+            row.put("Order ID", String.valueOf(order.getOrderId()));
+            row.put("Total Price", String.format("$%.2f", order.getTotalPrice()));
+            row.put("Status", order.getStatus().getName());
+            row.put("Order Date", order.getCreatedAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            displayData.add(row);
+        }
+
+        String table = AsciiTable.getTable(displayData, Arrays.asList(
+                new Column().header("Order ID").headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER).with(row -> row.get("Order ID")),
+                new Column().header("Total Price").headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.RIGHT).with(row -> row.get("Total Price")),
+                new Column().header("Status").headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.CENTER).with(row -> row.get("Status")),
+                new Column().header("Order Date").headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.LEFT).with(row -> row.get("Order Date"))
+        ));
+
+        print("\n🔹 List of Orders 🔹");
+        print(table);
+    };
 
     void processOrder(List<ProductOrder> orderItems, double totalPrice) {
         print("✅ Order confirmed! Processing your order...");

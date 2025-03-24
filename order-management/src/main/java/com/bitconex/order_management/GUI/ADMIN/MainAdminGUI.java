@@ -35,8 +35,7 @@ public class MainAdminGUI {
                     print("1. User Administration");
                     print("2. Product Catalog");
                     print("3. Order Administration");
-                    print("4. Export list of all orders in CSV");
-                    print("5. Exit");
+                    print("4. Exit");
 
                     print("Select an option: ");
                     choice = scanner.nextInt();
@@ -68,9 +67,6 @@ public class MainAdminGUI {
                     orderAdministrationGUI.startOrderAdminConsole();
                     break;
                 case 4:
-
-                    break;
-                case 5:
                     print("Exiting Admin Panel...");
                     mainMenu.start();
                     return;
