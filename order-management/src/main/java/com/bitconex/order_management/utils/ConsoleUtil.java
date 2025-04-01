@@ -9,7 +9,7 @@ public class ConsoleUtil {
     public static final String YELLOW = "\u001B[33m";
 
     public static void printSuccess(String message) {
-        System.out.println(GREEN + "✅ " + message + RESET);
+        System.out.println(GREEN + "✅ tesst " + message + RESET);
     }
 
     public static void printError(String message) {
