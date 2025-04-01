@@ -22,5 +22,6 @@ jobs:
 
       - name: 🧪 Build and Test with Maven
         run: |
+          cd order-management
           mvn clean install
           mvn test
