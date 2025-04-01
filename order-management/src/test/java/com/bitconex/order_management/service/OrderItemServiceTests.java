@@ -73,7 +73,7 @@ public class OrderItemServiceTests {
     void testGetAllOrderItems_ShouldReturnAllOrderItems() {
         when(orderItemRepository.findAll()).thenReturn(List.of(orderItem));
         List<OrderItem> result = orderItemService.getAllOrderItems();
-        assertThat(result).isEmpty();
+        assertThat(result).isNotEmpty().contains(orderItem);
         verify(orderItemRepository, times(1)).findAll();
     }
 
