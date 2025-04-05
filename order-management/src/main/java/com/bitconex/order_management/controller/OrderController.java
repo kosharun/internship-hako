@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -18,14 +17,20 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    ResponseEntity<List<OrderDTO>> getAllOrders() {
+    @GetMapping("/admin/orders")
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
-    @PostMapping
-    ResponseEntity<OrderDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
+    @PostMapping("/orders")
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
         return ResponseEntity.ok(orderService.createOrder(orderRequestDTO));
     }
 
+
+    @PutMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok().build();
+    }
 }
