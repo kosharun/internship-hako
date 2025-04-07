@@ -229,17 +229,40 @@ public class ProductCatalogGUI {
     void updateQuantity() {
         getAllProducts();
 
-        print("Type in the ID of the product you want to update: ");
-        Long Id = scanner.nextLong();
-        scanner.nextLine();
+        Long id = null;
+        while (id == null || id <= 0) {
+            print("Type in the ID of the product you want to update: ");
+            String idInput = scanner.nextLine();
+            try {
+                id = Long.parseLong(idInput);
+                if (id <= 0) {
+                    printError("Product ID must be a positive number.");
+                    id = null;
+                }
+            } catch (NumberFormatException e) {
+                printError("Invalid input. Please enter a numeric product ID.");
+            }
+        }
 
-        print("Enter the new stock quantity: ");
-        int stockQuantity = scanner.nextInt();
-        scanner.nextLine();
+        Integer stockQuantity = null;
+        while (stockQuantity == null || stockQuantity < 0) {
+            print("Enter the new stock quantity: ");
+            String quantityInput = scanner.nextLine();
+            try {
+                stockQuantity = Integer.parseInt(quantityInput);
+                if (stockQuantity < 0) {
+                    printError("Quantity cannot be negative.");
+                    stockQuantity = null;
+                }
+            } catch (NumberFormatException e) {
+                printError("Invalid input. Please enter a numeric value for quantity.");
+            }
+        }
 
-        productService.updateProductQuantity(Id, stockQuantity);
+        productService.updateProductQuantity(id, stockQuantity);
         printSuccess("Product quantity updated successfully.");
     }
+
 
 
 
