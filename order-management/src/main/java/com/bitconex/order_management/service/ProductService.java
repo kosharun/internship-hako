@@ -108,7 +108,7 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cannot find product!"));
 
-        orderItemRepository.deleteByProduct(product); // Ovo mora postojati u repository-ju
+        orderItemRepository.deleteByProduct(product);
 
         productRepository.delete(product);
         printSuccess("Successfully removed product: " + product.getName());

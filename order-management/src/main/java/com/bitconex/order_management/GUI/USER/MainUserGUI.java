@@ -96,8 +96,15 @@ public class MainUserGUI {
     void cancelOrder() {
         printAllOrders(sessionManager.getCurrentUserId());
         print("Enter the order ID of the order you want to cancel: ");
-        Long orderId = scanner.nextLong();
-        scanner.nextLine();
+        String input = scanner.nextLine();
+        Long orderId;
+
+        try {
+            orderId = Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            printError("Invalid order ID. Please enter a numeric value.");
+            return;
+        }
 
         try {
             Order order = orderService.getOrderById(orderId);
