@@ -13,8 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import static com.bitconex.order_management.utils.ConsoleUtil.print;
-import static com.bitconex.order_management.utils.ConsoleUtil.printError;
+
+import static com.bitconex.order_management.utils.ConsoleUtil.*;
 
 @Component
 public class OrderAdministrationGUI {
@@ -88,14 +88,16 @@ public class OrderAdministrationGUI {
             return;
         }
 
-        String folderName = "orderCSVs";
+        print("Enter folder path to save the CSV file (leave empty for default 'orderCSVs' folder): ");
+        String inputPath = scanner.nextLine().trim();
+
+        String folderName = inputPath.isEmpty() ? "orderCSVs" : inputPath;
         File folder = new File(folderName);
 
         if (!folder.exists() && !folder.mkdirs()) {
             printError("Failed to create directory: " + folderName);
             return;
         }
-
 
         String fileName = folderName + "/orders_export_" +
                 DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(java.time.LocalDateTime.now()) + ".csv";
@@ -117,7 +119,7 @@ public class OrderAdministrationGUI {
                 writer.println(csvRow);
             }
 
-            print("✅ Orders successfully exported to " + fileName);
+            printSuccess("✅ Orders successfully exported to: " + fileName);
 
         } catch (FileNotFoundException e) {
             printError("Error creating file: " + e.getMessage());
@@ -125,6 +127,7 @@ public class OrderAdministrationGUI {
             printError("Unexpected error during export: " + e.getMessage());
         }
     }
+
 
 
     private void viewAllOrders() {
