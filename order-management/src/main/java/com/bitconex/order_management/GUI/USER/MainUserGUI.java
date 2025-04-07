@@ -128,8 +128,14 @@ public class MainUserGUI {
                 return;
             }
 
+            print("Are you sure you want to cancel this order? (yes/no): ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (!confirmation.equals("yes")) {
+                print("Cancellation aborted.");
+                return;
+            }
+
             orderService.cancelOrder(orderId);
-            print("Order with ID " + orderId + " cancelled successfully.");
         } catch (Exception e) {
             printError("Error cancelling order - " + e.getMessage());
         }
