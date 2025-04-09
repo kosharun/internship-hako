@@ -23,11 +23,10 @@ public class DTOMapper {
         modelMapper.addMappings(new PropertyMap<OrderItem, OrderItemDTO>() {
             @Override
             protected void configure() {
-                map(source.getOrder().getOrderId(), destination.getOrderId());  // Explicitly mapping the orderId from Order to DTO
+                map(source.getOrder().getOrderId(), destination.getOrderId());
             }
         });
     }
-
 
     public UserDTO mapToDTO(User user) {
         return modelMapper.map(user, UserDTO.class);
@@ -46,7 +45,6 @@ public class DTOMapper {
     public OrderItemDTO mapToDTO(OrderItem orderItem) {
         return modelMapper.map(orderItem, OrderItemDTO.class);
     }
-
     public User mapToEntity(UserRequestDTO userRequestDTO) {
         return modelMapper.map(userRequestDTO, User.class);
     }

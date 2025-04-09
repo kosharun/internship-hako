@@ -53,11 +53,12 @@ public class OrderServiceTests {
     void setUp() {
         user = User.builder().userId(1L).build();
 
-        order = new Order();
-        order.setOrderId(100L);
-        order.setUser(user);
-        order.setTotalPrice(50.0);
-        order.setCreatedAt(LocalDate.now());
+        order = Order.builder()
+                .orderId(100L)
+                .user(user)
+                .totalPrice(50.0)
+                .createdAt(LocalDate.now())
+                .build();
 
         orderStatus = new OrderStatus();
         orderStatus.setName("Pending");
