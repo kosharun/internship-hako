@@ -10,6 +10,7 @@ import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.OrderRepository;
 import com.bitconex.order_management.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.ObjectError;
 
 import java.time.LocalDate;
@@ -63,6 +64,7 @@ public class OrderService {
         return orderRepository.findById(Id).orElseThrow(() -> new RuntimeException("Cannot find order"));
     }
 
+    @Transactional
     public OrderDTO createOrder(OrderRequestDTO orderRequestDTO) {
 
         Long userId = orderRequestDTO.getUserId();

@@ -21,6 +21,7 @@ import jakarta.validation.Validator;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class UserService {
         this.validator = validator;
     }
 
+    @Transactional
     public UserDTO createUser(@Valid UserRequestDTO userRequestDTO) {
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(userRequestDTO);
         if (!violations.isEmpty()) {
@@ -81,6 +83,7 @@ public class UserService {
         return dtoMapper.mapToDTO(user);
     }
 
+    @Transactional
     public UserDTO createAdmin(@Valid UserAdminRequestDTO userAdminRequestDTO) {
         Set<ConstraintViolation<UserAdminRequestDTO>> violations = validator.validate(userAdminRequestDTO);
         if (!violations.isEmpty()) {
@@ -126,7 +129,7 @@ public class UserService {
         return dtoMapper.mapToDTO(userRepository.findByUsername(username).orElseThrow());
     }
 
-
+    @Transactional
     public void deleteUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found!"));

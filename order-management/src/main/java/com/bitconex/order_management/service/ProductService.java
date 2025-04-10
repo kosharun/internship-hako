@@ -45,6 +45,7 @@ public class ProductService {
         this.dtoMapper = dtoMapper;
     }
 
+    @Transactional
     public Product createProduct(ProductRequestDTO productRequestDTO) {
 
         Catalog catalog = catalogRepository.findFirstByOrderByCatalogId().orElseThrow(() -> new RuntimeException("Default catalog not found!"));
