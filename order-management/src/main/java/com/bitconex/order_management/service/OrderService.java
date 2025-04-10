@@ -2,12 +2,10 @@ package com.bitconex.order_management.service;
 
 import com.bitconex.order_management.dto.OrderDTO;
 import com.bitconex.order_management.dto.OrderRequestDTO;
-import com.bitconex.order_management.entity.Order;
-import com.bitconex.order_management.entity.OrderStatus;
-import com.bitconex.order_management.entity.Product;
-import com.bitconex.order_management.entity.User;
+import com.bitconex.order_management.entity.*;
 import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.OrderRepository;
+import com.bitconex.order_management.repository.ProductRepository;
 import com.bitconex.order_management.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +25,14 @@ public class OrderService {
     private final DTOMapper dtoMapper;
     private final UserRepository userRepository;
     private final OrderStatusService orderStatusService;
+    private final ProductRepository productRepository;
 
-    public OrderService(OrderRepository orderRepository, DTOMapper dtoMapper, UserRepository userRepository, OrderStatusService orderStatusService) {
+    public OrderService(OrderRepository orderRepository, DTOMapper dtoMapper, UserRepository userRepository, OrderStatusService orderStatusService, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.dtoMapper = dtoMapper;
         this.userRepository = userRepository;
         this.orderStatusService = orderStatusService;
+        this.productRepository = productRepository;
     }
 
 
@@ -94,11 +94,20 @@ public class OrderService {
         printSuccess("Successfully updated order status to: " + status);
     }
 
-
+    @Transactional
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
         OrderStatus orderStatus = orderStatusService.getOrderStatusByNameIgnoreCase("Cancelled")
                 .orElseThrow(() -> new RuntimeException("Status not found: Cancelled"));
+
+        for (OrderItem item : order.getOrderItems()) {
+            Product product = item.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+
+            productRepository.save(product);
+        }
+
+
         order.setStatus(orderStatus);
         orderRepository.save(order);
         printSuccess("Successfully cancelled order with ID: " + orderId);
