@@ -147,6 +147,11 @@ public class ProductCatalogGUI {
                         .dataAlign(HorizontalAlign.LEFT)
                         .with(product -> product.getCatalog() != null ? product.getCatalog().getName() : "N/A"),
                 new Column()
+                        .header("Available")
+                        .headerAlign(HorizontalAlign.CENTER)
+                        .dataAlign(HorizontalAlign.LEFT)
+                        .with(product -> product.isAvailable() ? String.valueOf(true) : String.valueOf(false)),
+                new Column()
                         .header("Name")
                         .headerAlign(HorizontalAlign.CENTER)
                         .dataAlign(HorizontalAlign.LEFT)
@@ -188,38 +193,12 @@ public class ProductCatalogGUI {
         Long Id = scanner.nextLong();
         scanner.nextLine();
 
-        List<OrderItemDTO> orderItemDTOS = productService.findOrderItemsRelatedToProduct(Id);
+        print("Are you sure you want to remove this product? (yes/no)");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
 
-        if (!orderItemDTOS.isEmpty()) {
-            printInfo("This product is associated with the following order items:");
-
-            String table = AsciiTable.getTable(orderItemDTOS, Arrays.asList(
-                    new Column()
-                            .header("Order ID")
-                            .headerAlign(HorizontalAlign.CENTER)
-                            .dataAlign(HorizontalAlign.CENTER)
-                            .with(orderItem -> String.valueOf(orderItem.getOrderId())),
-                    new Column()
-                            .header("Product ID")
-                            .headerAlign(HorizontalAlign.CENTER)
-                            .dataAlign(HorizontalAlign.CENTER)
-                            .with(orderItem -> String.valueOf(orderItem.getProductId())),
-                    new Column()
-                            .header("Quantity")
-                            .headerAlign(HorizontalAlign.CENTER)
-                            .dataAlign(HorizontalAlign.RIGHT)
-                            .with(orderItem -> String.valueOf(orderItem.getQuantity()))
-            ));
-
-            print(table);
-
-            print("Are you sure you want to remove this product? (yes/no)");
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-
-            if (!confirmation.equals("yes")) {
-                printInfo("Product removal canceled.");
-                return;
-            }
+        if (!confirmation.equals("yes")) {
+            printInfo("Product removal canceled.");
+            return;
         }
 
         productService.removeProduct(Id);

@@ -11,6 +11,7 @@ import com.bitconex.order_management.entity.User;
 import com.bitconex.order_management.mapper.DTOMapper;
 import com.bitconex.order_management.repository.CatalogRepository;
 import com.bitconex.order_management.repository.OrderItemRepository;
+import com.bitconex.order_management.repository.OrderRepository;
 import com.bitconex.order_management.repository.ProductRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -37,12 +38,14 @@ public class ProductService {
     private final CatalogRepository catalogRepository;
     private final OrderItemRepository orderItemRepository;
     private final DTOMapper dtoMapper;
+    private final OrderRepository orderRepository;
 
-    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, DTOMapper dtoMapper) {
+    public ProductService(ProductRepository productRepository, CatalogRepository catalogRepository, OrderItemRepository orderItemRepository, DTOMapper dtoMapper, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.catalogRepository = catalogRepository;
         this.orderItemRepository = orderItemRepository;
         this.dtoMapper = dtoMapper;
+        this.orderRepository = orderRepository;
     }
 
     @Transactional
@@ -109,10 +112,8 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cannot find product!"));
 
-        orderItemRepository.deleteByProduct(product);
-
-        productRepository.delete(product);
-        printSuccess("Successfully removed product: " + product.getName());
+        product.setAvailable(false);
+        productRepository.save(product);
     }
 
     public List<OrderItemDTO> findOrderItemsRelatedToProduct(Long Id) {
